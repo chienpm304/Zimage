@@ -86,7 +86,7 @@ public class ZimageControllerTest {
         try {
             Zimage.getInstance()
                     .with(context)
-                    .from("https://1234124")
+                    .from("https://1234124.com")
                     .into(imgView);
         } catch (Exception e) {
             err  = e;
@@ -140,6 +140,31 @@ public class ZimageControllerTest {
 
     }
 
+
+    @Test
+    public void testLoadNullBitmap(){
+        Zimage.getInstance().reset();
+
+        Context context = getContext();
+        ImageView imgView = new ImageView(context);
+        Exception err = null;
+
+        try{
+            Zimage.getInstance()
+                    .with(context)
+                    .from("http://fb.com/chienpm.jpg")
+                    .resize(100, 150)
+                    .errorMsg("Oops!")
+                    .loadingMsg("Loading..")
+                    .into(imgView);
+        }
+        catch (Exception e){
+            err = e;
+            e.printStackTrace();
+        }
+
+        assertNull(err);
+    }
 
     @Test
     public void testPerfectFlow(){

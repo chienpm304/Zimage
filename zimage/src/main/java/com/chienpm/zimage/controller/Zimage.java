@@ -1,13 +1,18 @@
 package com.chienpm.zimage.controller;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
-import com.chienpm.zimage.utils.MyUtils;
+import com.chienpm.zimage.disk_layer.DiskCache;
+import com.chienpm.zimage.mapping.ImageMapper;
+import com.chienpm.zimage.memory_layer.MemoryCache;
+import com.chienpm.zimage.network_layer.ImageDownloader;
 import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.utils.Validator;
 
 /**
  * Zimage is the master class to apply url image into a ImageView
@@ -150,42 +155,58 @@ public class Zimage {
      */
     private void validateParameters() throws Exception{
         try{
-            checkContext();
-            checkUrl();
-            checkImageView();
+            Validator.checkContext(mContext);
+            Validator.checkUrl(mUrl);
+            Validator.checkImageView(mImageView);
         }
         catch (Exception e){
             throw e;
         }
     }
 
-    private void checkImageView() throws Exception{
-        if(mImageView == null)
-            throw new Exception(MsgDef.ERR_INVALID_IMAGE_VIEW);
-        if(!(mImageView instanceof ImageView))
-            throw new Exception(MsgDef.ERR_INVALID_IMAGE_VIEW);
-
-    }
-
-    private void checkUrl() throws Exception{
-        if(!MyUtils.isValidUrlPattern(mUrl))
-            throw new Exception(MsgDef.ERR_INVALID_IMAGE_URL);
-        else{
-            //Todo: need to request to http url to check invalid image here?
-        }
-    }
-
-    private void checkContext() throws Exception{
-        if(mContext == null)
-            throw new Exception(MsgDef.ERR_INVALID_CONTEXT);
-    }
 
 
     /***
      *  Start to loading image processes
      */
-    private void loadImage() {
+    public void loadImage() throws Exception {
+        Bitmap bitmap = null;
 
+        String key = ImageMapper.generateImageKey(mUrl);
+
+        //Try to load image from memory cache
+        bitmap = MemoryCache.getBitmap(key);
+
+        if(Validator.checkBitmap(bitmap)) {
+            applyBitmapToImageView(bitmap);
+            return;
+        }
+
+
+        // Try to load image from disk
+        bitmap = DiskCache.loadBitmap(key);
+        if(Validator.checkBitmap(bitmap)) {
+            applyBitmapToImageView(bitmap);
+            return;
+        }
+
+        // Download image from network
+        bitmap = ImageDownloader.downloadImageAndConvertToBitmap(key, mUrl);
+        if(Validator.checkBitmap(bitmap)) {
+            applyBitmapToImageView(bitmap);
+            return;
+        }
+        throw new Exception(MsgDef.ERR_FATAL_NOT_KNOW_WHY);
+
+
+
+
+
+    }
+
+
+    private void applyBitmapToImageView(@NonNull Bitmap bitmap) throws Exception{
+        mImageView.setImageBitmap(bitmap);
     }
 
 }
