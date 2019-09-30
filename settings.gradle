@@ -1,0 +1,2 @@
+include ':app', ':zimage'
+rootProject.name='ZimageSample'
