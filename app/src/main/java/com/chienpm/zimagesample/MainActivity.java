@@ -1,11 +1,11 @@
 package com.chienpm.zimagesample;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 
-import com.chienpm.zimage.Zimage;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.chienpm.zimage.controller.Zimage;
 
 public class MainActivity extends AppCompatActivity {
 
