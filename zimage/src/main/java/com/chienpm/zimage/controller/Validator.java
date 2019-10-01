@@ -1,14 +1,24 @@
-package com.chienpm.zimage.utils;
+package com.chienpm.zimage.controller;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
+
+import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.utils.MyUtils;
 
 
 /***
  *  Validator is a helper class providing validation methods
  */
 public class Validator {
+
+    /***
+     * Check if the ImageView passed is correct to apply bitmap on or not.
+     * @param mImageView
+     * @throws Exception if the ImageView passed is NULL or not instance of ImageView
+     *         Exception return message: @MsgDef.ERR_INVALID_IMAGE_VIEW
+     */
     public static void checkImageView(ImageView mImageView) throws Exception{
         if(mImageView == null)
             throw new Exception(MsgDef.ERR_INVALID_IMAGE_VIEW);
@@ -17,6 +27,13 @@ public class Validator {
 
     }
 
+
+    /**
+     * Check if the Image URL passed is matching with standard url pattern or not
+     * Do not check if it is a real image'url or not, we do in Network Layer later (if need)
+     * @param mUrl string
+     * @throws Exception message return: @MsgDef.ERR_INVALID_IMAGE_URL
+     */
     public static void checkUrl(String mUrl) throws Exception{
         if(!MyUtils.isValidUrlPattern(mUrl))
             throw new Exception(MsgDef.ERR_INVALID_IMAGE_URL);
@@ -25,13 +42,25 @@ public class Validator {
         }
     }
 
+    /**
+     * Check if the context passed is valid or not, context is necessary for system accession
+     * @param mContext
+     * @throws Exception message @MsgDef.ERR_INVALID_CONTEXT
+     */
     public static void  checkContext(Context mContext) throws Exception{
         if(mContext == null)
             throw new Exception(MsgDef.ERR_INVALID_CONTEXT);
     }
 
+
+    /**
+     * Check the input bitmap is valid and ready to use or not
+     * @param bitmap
+     * @return True or False
+     */
     public static boolean checkBitmap(Bitmap bitmap) {
         //Todo: validate if bitmap is invalid
         return bitmap!=null;
     }
+
 }

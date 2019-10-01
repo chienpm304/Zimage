@@ -7,12 +7,10 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
-import com.chienpm.zimage.disk_layer.DiskCache;
-import com.chienpm.zimage.mapping.ImageMapper;
-import com.chienpm.zimage.memory_layer.MemoryCache;
-import com.chienpm.zimage.network_layer.ImageDownloader;
+import com.chienpm.zimage.disk_layer.DiskCacheManager;
+import com.chienpm.zimage.memory_layer.MemoryCacheManager;
+import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.utils.MsgDef;
-import com.chienpm.zimage.utils.Validator;
 
 /**
  * Zimage is the master class to apply url image into a ImageView
@@ -28,6 +26,8 @@ import com.chienpm.zimage.utils.Validator;
 public class Zimage {
 
     public static int VERSION = 1;
+
+    /* Zimage's exclusively instance*/
     private static Zimage mInstance = null;
 
     private static Object ZSync = new Object();
@@ -172,10 +172,10 @@ public class Zimage {
     public void loadImage() throws Exception {
         Bitmap bitmap = null;
 
-        String key = ImageMapper.generateImageKey(mUrl);
+//        String key = MappingManager.get(mUrl);
 
         //Try to load image from memory cache
-        bitmap = MemoryCache.getBitmap(key);
+        bitmap = MemoryCacheManager.getBitmap(mUrl);
 
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
@@ -184,14 +184,18 @@ public class Zimage {
 
 
         // Try to load image from disk
-        bitmap = DiskCache.loadBitmap(key);
+        bitmap = DiskCacheManager.loadBitmap(mUrl);
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
+
+            // Cached bitmap loaded on memory
+            MemoryCacheManager.saveBitmap(mUrl, bitmap);
+
             return;
         }
 
         // Download image from network
-        bitmap = ImageDownloader.downloadImageAndConvertToBitmap(key, mUrl);
+        bitmap = NetworkManager.downloadImageAndConvertToBitmap(mUrl);
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
             return;
