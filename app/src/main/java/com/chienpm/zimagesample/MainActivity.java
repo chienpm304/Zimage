@@ -36,16 +36,16 @@ public class MainActivity extends AppCompatActivity {
         Zimage
                 .getInstance()
                 .with(this)
-                .from("http://fb.com/123")
+                .from("http://fb.com/123^^^")
                 .addListener(new Zimage.ZimageCallback() {
                     @Override
                     public void onSucceed(@NonNull ImageView imageView, @NonNull String url) {
-                        Toast.makeText(getApplicationContext(), "Load image SUCCEED", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Error: ", Toast.LENGTH_LONG).show();
                     }
 
                     @Override
                     public void onError(@Nullable ImageView imageView, @NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "Load image FAILED", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Load image FAILED"+e.getMessage(), Toast.LENGTH_LONG).show();
                     }
 
                     @Override

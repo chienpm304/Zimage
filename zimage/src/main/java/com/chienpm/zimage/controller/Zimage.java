@@ -160,6 +160,7 @@ public class Zimage {
         catch (Exception e){
             if(mListener!=null)
                 mListener.onError(mImageView, e);
+            applyErrorImage();
 //            throw e;
         }
     }
@@ -214,7 +215,8 @@ public class Zimage {
         }
 
         // Download image from network
-        bitmap = NetworkManager.downloadImageAndConvertToBitmap(mUrl);
+        bitmap = NetworkManager.downloadImageAndConvertToBitmap(mContext, mUrl);
+
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
 
@@ -224,7 +226,6 @@ public class Zimage {
             return;
         }
 
-        applyErrorImage();
         throw new Exception(MsgDef.ERR_INVALID_BITMAP);
 
     }
