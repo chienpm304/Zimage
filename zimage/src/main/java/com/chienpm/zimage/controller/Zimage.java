@@ -2,14 +2,17 @@ package com.chienpm.zimage.controller;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
+import com.chienpm.zimage.R;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
 import com.chienpm.zimage.network_layer.NetworkManager;
+import com.chienpm.zimage.utils.ImageUtils;
 import com.chienpm.zimage.utils.MsgDef;
 
 /**
@@ -34,11 +37,12 @@ public class Zimage {
 
     private Context mContext;
     private String mUrl;
-    private String mLoadingMsg;
-    private String mErrorMsg;
+    private int mLoadingResId;
+    private int mErrorResId;
     private ImageView mImageView;
     private int mWidth;
     private int mHeight;
+    private ZimageCallback mListener;
 
     private Zimage() {
         reset();
@@ -59,8 +63,9 @@ public class Zimage {
         mContext = null;
         mUrl = "";
         mImageView = null;
-        mLoadingMsg = MsgDef.MSG_IMG_LOADING;
-        mErrorMsg = MsgDef.MSG_IMG_ERROR;
+        mListener = null;
+        mLoadingResId = R.drawable.default_loading_drawable;
+        mErrorResId = R.drawable.default_error_drawable;
         mWidth = 0;
         mHeight = 0;
     }
@@ -80,8 +85,18 @@ public class Zimage {
      * @param url: Image string url need to display
      * @return Zimage instance to continuous builder
      */
-    public Zimage from(@NonNull String url) throws Exception{
+    public Zimage from(@NonNull String url) {
         this.mUrl = url;
+        return mInstance;
+    }
+
+    /**
+     * Add an @ZimageCallback to listen the callback result is succeed or failed
+     * @param listener
+     * @return
+     */
+    public Zimage addListener(@NonNull ZimageCallback listener){
+        this.mListener = listener;
         return mInstance;
     }
 
@@ -100,14 +115,14 @@ public class Zimage {
 
     /***
      *
-     * @param loadingMsg is the text which will be render on ImageView while loading
+     * @param resId is the Resource which will be render on ImageView while loading
      * @return Zimage instance to continuous builder
      */
-    public Zimage loadingMsg(@NonNull String loadingMsg){
-        if(TextUtils.isEmpty(loadingMsg))
-            loadingMsg = MsgDef.MSG_IMG_LOADING;
+    public Zimage loadingResourceId(@NonNull int resId){
+        if(Validator.checkResourceId(resId))
+            resId = R.drawable.default_loading_drawable;
 
-        this.mLoadingMsg = loadingMsg;
+        this.mLoadingResId = resId;
 
         return mInstance;
     }
@@ -115,14 +130,14 @@ public class Zimage {
 
     /***
      *
-     * @param errorMsg is the text which will be render on ImageView while loading
+     * @param resId is the Resource which will be render on ImageView when loading failed
      * @return Zimage instance to continuous builder
      */
-    public Zimage errorMsg(@NonNull String errorMsg){
-        if(TextUtils.isEmpty(errorMsg))
-            errorMsg = MsgDef.MSG_IMG_ERROR;
+    public Zimage errorResId(@NonNull int resId){
+        if(Validator.checkResourceId(resId))
+            resId = R.drawable.default_error_drawable;
 
-        this.mErrorMsg = errorMsg;
+        this.mErrorResId = resId;
 
         return mInstance;
     }
@@ -134,7 +149,7 @@ public class Zimage {
      *         if any error occurs, an Eroor message will be render in ImageView.
      * @throws Exception if the parameters passed before is INVALID
      */
-    public void into(@NonNull ImageView imageView) throws Exception{
+    public void into(@NonNull ImageView imageView){
         this.mImageView = imageView;
 
         try {
@@ -143,7 +158,9 @@ public class Zimage {
             loadImage();
         }
         catch (Exception e){
-            throw e;
+            if(mListener!=null)
+                mListener.onError(mImageView, e);
+//            throw e;
         }
     }
 
@@ -172,10 +189,12 @@ public class Zimage {
     public void loadImage() throws Exception {
         Bitmap bitmap = null;
 
-//        String key = MappingManager.get(mUrl);
+        // Apply loading image while fetch image
+        applyLoadingImage();
+
 
         //Try to load image from memory cache
-        bitmap = MemoryCacheManager.getBitmap(mUrl);
+        bitmap = MemoryCacheManager.getBitmapFromMemory(mUrl);
 
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
@@ -189,7 +208,7 @@ public class Zimage {
             applyBitmapToImageView(bitmap);
 
             // Cached bitmap loaded on memory
-            MemoryCacheManager.saveBitmap(mUrl, bitmap);
+            MemoryCacheManager.loadBitmapInMemory(mUrl, bitmap);
 
             return;
         }
@@ -198,19 +217,47 @@ public class Zimage {
         bitmap = NetworkManager.downloadImageAndConvertToBitmap(mUrl);
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
+
+            DiskCacheManager.saveBitmapOnDisk(mUrl, bitmap);
+
+            MemoryCacheManager.loadBitmapInMemory(mUrl, bitmap);
             return;
         }
-        throw new Exception(MsgDef.ERR_FATAL_NOT_KNOW_WHY);
 
-
-
-
+        applyErrorImage();
+        throw new Exception(MsgDef.ERR_INVALID_BITMAP);
 
     }
 
 
+    private void applyLoadingImage() {
+        ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mLoadingResId);
+    }
+
+
+    private void applyErrorImage() {
+        ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mErrorResId);
+    }
+
+
     private void applyBitmapToImageView(@NonNull Bitmap bitmap) throws Exception{
-        mImageView.setImageBitmap(bitmap);
+        try {
+            mImageView.setImageBitmap(bitmap);
+            if(mListener!=null)
+                mListener.onSucceed(mImageView, mUrl);
+        }
+        catch (Exception e){
+            throw e;
+        }
+    }
+
+
+    public interface ZimageCallback {
+        void onSucceed(@NonNull ImageView imageView, @NonNull String url);
+        void onError(@Nullable ImageView imageView, @NonNull Exception e);
+
+        @VisibleForTesting
+        boolean getResult();
     }
 
 }

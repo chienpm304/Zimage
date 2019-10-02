@@ -1,18 +1,13 @@
 package com.chienpm.zimage;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.chienpm.zimage.controller.Zimage;
 import com.chienpm.zimage.utils.MsgDef;
 
@@ -160,9 +155,7 @@ public class ZimageControllerTest {
             Zimage.getInstance()
                     .with(context)
                     .from("http://fb.com/chienpm.jpg")
-                    .resize(100, 150)
-                    .errorMsg("Oops!")
-                    .loadingMsg("Loading..")
+//                    .resize(100, 150)
                     .into(imgView);
         }
         catch (Exception e){
@@ -181,20 +174,39 @@ public class ZimageControllerTest {
         ImageView imgView = new ImageView(context);
         Exception err = null;
 
+        Zimage.ZimageCallback callback = new Zimage.ZimageCallback() {
+            Boolean result = null;
+
+            public boolean getResult() {
+                return result;
+            }
+
+            @Override
+            public void onSucceed(@NonNull ImageView imageView, @NonNull String url) {
+                result = Boolean.TRUE;
+            }
+
+            @Override
+            public void onError(@Nullable ImageView imageView, @NonNull Exception e) {
+                result = Boolean.FALSE;
+            }
+        };
+
+
         try{
             Zimage.getInstance()
                     .with(context)
                     .from("http://fb.com/chienpm.jpg")
                     .resize(100, 150)
-                    .errorMsg("Oops!")
-                    .loadingMsg("Loading..")
+                    .addListener(callback)
                     .into(imgView);
         }
         catch (Exception e){
             err = e;
         }
 
-        assertNull(err);
+//        assertNull(err);
+        assertEquals(Boolean.TRUE, callback.getResult());
     }
 
 
@@ -203,19 +215,19 @@ public class ZimageControllerTest {
         Context ctx = getContext();
         ImageView imageView = new ImageView(ctx);
 
-        Glide
-                .with(ctx)
-                .load("asf").addListener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                })
-                .into(imageView);
+//        Glide
+//                .with(ctx)
+//                .load("asf").addListener(new RequestListener<Drawable>() {
+//                    @Override
+//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+//                        return false;
+//                    }
+//
+//                    @Override
+//                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+//                        return false;
+//                    }
+//                })
+//                .into(imageView);
     }
 }

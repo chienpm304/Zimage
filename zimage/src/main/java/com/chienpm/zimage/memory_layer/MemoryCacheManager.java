@@ -13,13 +13,17 @@ import com.chienpm.zimage.mapping.MappingManager;
  */
 public class MemoryCacheManager {
 
-    public static Bitmap getBitmap(@NonNull String url) {
+    public static Bitmap getBitmapFromMemory(@NonNull String url) {
         String key = MappingManager.generateKeyFromUrl(url);
 
         return null;
     }
 
-    public static void saveBitmap(String url, Bitmap bitmap) {
+    public static void loadBitmapInMemory(String url, Bitmap bitmap) {
+
+        String key = MappingManager.generateKeyFromUrl(url);
+
+        //load bitmap into memory with key access
 
     }
 }

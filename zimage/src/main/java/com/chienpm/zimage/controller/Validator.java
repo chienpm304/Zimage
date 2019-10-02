@@ -60,7 +60,12 @@ public class Validator {
      */
     public static boolean checkBitmap(Bitmap bitmap) {
         //Todo: validate if bitmap is invalid
-        return bitmap!=null;
+        return false;
+//        return bitmap!=null;
     }
 
+
+    public static boolean checkResourceId(int resId) {
+        return false;
+    }
 }

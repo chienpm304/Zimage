@@ -25,7 +25,11 @@ public class DiskCacheManager {
         return null;
     }
 
-    public static void saveBitmap(String key, Bitmap bitmap) {
+    public static void saveBitmapOnDisk(String url, Bitmap bitmap) {
+
+        File file = MappingManager.getLocalFileFromURL(url);
+
+        //save bitmap to file
 
     }
 }
