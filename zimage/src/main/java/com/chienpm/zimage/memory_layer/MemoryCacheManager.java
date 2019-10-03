@@ -14,14 +14,14 @@ import com.chienpm.zimage.mapping.MappingManager;
 public class MemoryCacheManager {
 
     public static Bitmap getBitmapFromMemory(@NonNull String url) {
-        String key = MappingManager.generateKeyFromUrl(url);
+        String key = MappingManager.generateMemoryKeyFromUrl(url);
 
         return null;
     }
 
     public static void loadBitmapInMemory(String url, Bitmap bitmap) {
 
-        String key = MappingManager.generateKeyFromUrl(url);
+        String key = MappingManager.generateMemoryKeyFromUrl(url);
 
         //load bitmap into memory with key access
 

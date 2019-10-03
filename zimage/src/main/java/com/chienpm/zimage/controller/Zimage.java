@@ -11,9 +11,11 @@ import androidx.annotation.VisibleForTesting;
 import com.chienpm.zimage.R;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
+import com.chienpm.zimage.network_layer.Downloader.DownloaderCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.utils.ImageUtils;
-import com.chienpm.zimage.utils.MsgDef;
+
+import java.io.File;
 
 /**
  * Zimage is the master class to apply url image into a ImageView
@@ -146,22 +148,27 @@ public class Zimage {
      *
      * @param imageView: the ImageView which will be apply image from url on.
      * @return the ImageView with an image rendered on it.
-     *         if any error occurs, an Eroor message will be render in ImageView.
-     * @throws Exception if the parameters passed before is INVALID
+     *         if any error occurs, an Error message will be render in ImageView
+     *         and ErrorCallback will be called
+     *
      */
     public void into(@NonNull ImageView imageView){
         this.mImageView = imageView;
 
         try {
-            validateParameters();
+            // Apply loading image while fetch image
+            applyLoadingImage();
 
+            validateParameters();
+            //Todo: queue up the requests
             loadImage();
         }
         catch (Exception e){
             if(mListener!=null)
                 mListener.onError(mImageView, e);
+
+            // Apply error image when error occurs
             applyErrorImage();
-//            throw e;
         }
     }
 
@@ -188,11 +195,8 @@ public class Zimage {
      *  Start to loading image processes
      */
     public void loadImage() throws Exception {
+
         Bitmap bitmap = null;
-
-        // Apply loading image while fetch image
-        applyLoadingImage();
-
 
         //Try to load image from memory cache
         bitmap = MemoryCacheManager.getBitmapFromMemory(mUrl);
@@ -215,18 +219,28 @@ public class Zimage {
         }
 
         // Download image from network
-        bitmap = NetworkManager.downloadImageAndConvertToBitmap(mContext, mUrl);
+        NetworkManager.downloadFileFromURL(mContext, mUrl, new DownloaderCallback() {
+            @Override
+            public void onDownloadCompleted(@NonNull File targetFile) {
+//                Bitmap networkBitmap
+//                if(Validator.checkBitmap(bitmap)) {
+//                    applyBitmapToImageView(bitmap);
 
-        if(Validator.checkBitmap(bitmap)) {
-            applyBitmapToImageView(bitmap);
+//                    DiskCacheManager.saveBitmapOnDisk(mUrl, bitmap);
+//
+//                    MemoryCacheManager.loadBitmapInMemory(mUrl, bitmap);
+//
+//                }
+            }
 
-            DiskCacheManager.saveBitmapOnDisk(mUrl, bitmap);
+            @Override
+            public void onError(Exception err) {
 
-            MemoryCacheManager.loadBitmapInMemory(mUrl, bitmap);
-            return;
-        }
+            }
+        });
 
-        throw new Exception(MsgDef.ERR_INVALID_BITMAP);
+
+
 
     }
 
