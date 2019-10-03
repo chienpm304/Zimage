@@ -10,22 +10,24 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.chienpm.zimage.controller.Zimage;
+import com.chienpm.zimage.network_layer.Downloader;
+import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.network_layer.NetworkUtils;
 import com.chienpm.zimage.utils.MsgDef;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.io.File;
+
+import static org.junit.Assert.*;
 
 
 @RunWith(AndroidJUnit4.class)
 public class NetworkLayerTest {
 
     private Context mContext = getContext();
-    private String mUrl = "www.fb.com/1234";
+    private String mUrl = "http://www.project-disco.org/wp-content/uploads/2018/04/Android-logo-1024x576.jpg";
 
 
     public Context getContext(){
@@ -75,12 +77,21 @@ public class NetworkLayerTest {
         Bitmap bitmap = null;
         // Download image from network
         try {
-//            bitmap = NetworkManager.downloadFileFromURL(mContext, mUrl);
+            NetworkManager.downloadFileFromURL(mContext, mUrl, new Downloader.DownloaderCallback() {
+                @Override
+                public void onDownloadCompleted(@NonNull File targetFile) {
+                    assertTrue(targetFile.exists());
+                }
+
+                @Override
+                public void onError(Exception err) {
+                    assertNotEquals(MsgDef.ERR_NO_INTERNET_CONNECTION, err.getMessage());
+                }
+            });
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        assertNotNull(bitmap);
     }
 }
