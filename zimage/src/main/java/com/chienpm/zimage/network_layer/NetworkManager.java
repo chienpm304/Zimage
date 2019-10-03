@@ -2,15 +2,19 @@ package com.chienpm.zimage.network_layer;
 
 import android.content.Context;
 
-import com.chienpm.zimage.network_layer.Downloader.DownloaderCallback;
 import com.chienpm.zimage.utils.MsgDef;
 
-public class NetworkManager {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-    public static void downloadFileFromURL(Context context, String url, DownloaderCallback callback) throws Exception {
+public class NetworkManager {
+    static ExecutorService mPool = Executors.newFixedThreadPool(4);
+
+    public static void downloadFileFromURL(Context context, String url, DownloadTaskCallback callback) throws Exception {
         if(NetworkUtils.isNetworkConnected(context)){
 
-            Downloader.downloadFile(url, callback);
+            DownloadTask task = new DownloadTask(url, callback);
+            mPool.execute(task);
 
         }
         else{

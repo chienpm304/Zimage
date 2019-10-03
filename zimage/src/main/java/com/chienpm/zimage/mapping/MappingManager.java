@@ -19,11 +19,10 @@ public class MappingManager {
      * @param url
      * @return the temporary file path to download temporary image without extension
      */
-    public static String generateTemporaryFilePathFromUrl(String url) {
-        String file_name = Base64.encodeToString(url.getBytes(), Base64.DEFAULT);
+    public static File generateTemporaryFileFromUrl(String url, String extension) {
+        String file_name = Base64.encodeToString(url.getBytes(), Base64.DEFAULT)+extension;
 
-        return Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES) + "/Zimage/123141";
+        return new File(getBaseDir(), file_name);
     }
 
     public static File getLocalFileFromURL(String url) {
@@ -31,7 +30,13 @@ public class MappingManager {
     }
 
     public static File getBaseDir(){
-        File base = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Zimage");
-        return base;
+        File root = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "Zimage");
+
+        if (!root.exists()) {
+            root.mkdirs();
+        }
+
+        return root;
     }
 }

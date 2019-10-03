@@ -11,7 +11,7 @@ import androidx.annotation.VisibleForTesting;
 import com.chienpm.zimage.R;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
-import com.chienpm.zimage.network_layer.Downloader.DownloaderCallback;
+import com.chienpm.zimage.network_layer.DownloadTaskCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.utils.ImageUtils;
 
@@ -219,7 +219,7 @@ public class Zimage {
         }
 
         // Download image from network
-        NetworkManager.downloadFileFromURL(mContext, mUrl, new DownloaderCallback() {
+        NetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadTaskCallback() {
             @Override
             public void onDownloadCompleted(@NonNull File targetFile) {
 //                Bitmap networkBitmap

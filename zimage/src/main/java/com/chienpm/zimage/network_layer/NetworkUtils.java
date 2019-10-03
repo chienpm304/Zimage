@@ -1,6 +1,7 @@
 package com.chienpm.zimage.network_layer;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 
 import com.chienpm.zimage.mapping.MappingManager;
@@ -19,18 +20,23 @@ public class NetworkUtils {
                 cm.getActiveNetworkInfo().isConnected();
     }
 
-    public static File writeStreamToFile(InputStream inputStream, String outputPath) throws IOException {
+    public static void writeStreamToFile(InputStream inputStream, File targetFile) throws IOException {
 
-//        File targetFile = new File(outputPath);
-        FileOutputStream outStream = new FileOutputStream(MappingManager.getBaseDir());
+        try {
+            FileOutputStream outStream = new FileOutputStream(targetFile);
 
-        byte[] buffer = new byte[8 * 1024];
-        int bytesRead=-1;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outStream.write(buffer, 0, bytesRead);
+            byte[] buffer = new byte[8 * 1024];
+            int bytesRead = -1;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+            inputStream.close();
+            outStream.close();
+
+
+//            BitmapFactory.de
+        }catch (Exception e){
+            throw e;
         }
-        inputStream.close();
-        outStream.close();
-        return new File(outputPath);
     }
 }
