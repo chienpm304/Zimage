@@ -1,9 +1,14 @@
 package com.chienpm.zimage.network_layer;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.chienpm.zimage.controller.Validator;
+import com.chienpm.zimage.disk_layer.StorageUtils;
 import com.chienpm.zimage.mapping.MappingManager;
+import com.chienpm.zimage.utils.MsgDef;
 
 import java.io.File;
 import java.io.InputStream;
@@ -62,16 +67,31 @@ class DownloadTask implements Runnable{
                 outputFile = MappingManager.generateTemporaryFileFromUrl(mUrlStr, ext);
 
                 Log.i(TAG, "outputPath: "+outputFile.getAbsolutePath());
+
                 InputStream inputStream = httpConn.getInputStream();
 
-                NetworkUtils.writeStreamToFile(inputStream, outputFile);
+                // Try to decode bitmap from inputstream first
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
 
-                mCallback.onDownloadCompleted(outputFile);
+                if(Validator.checkBitmap(bitmap)) {
+
+                    mCallback.onDecodedBitmap(bitmap);
+
+                } else {
+
+                    NetworkUtils.writeStreamToFile(inputStream, outputFile);
+
+                    if(StorageUtils.checkOutputImageFile(outputFile))
+                        mCallback.onDownloadedImage(outputFile);
+                    else
+                        mCallback.onError(new Exception(MsgDef.ERR_INVALID_BITMAP));
+                }
             }
 
-        } catch (java.io.IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             mCallback.onError(e);
         }
     }
+
 }

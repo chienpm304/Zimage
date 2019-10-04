@@ -2,6 +2,7 @@ package com.chienpm.zimage.controller;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -162,14 +163,20 @@ public class Zimage {
             validateParameters();
             //Todo: queue up the requests
             loadImage();
+
+
         }
         catch (Exception e){
-            if(mListener!=null)
-                mListener.onError(mImageView, e);
-
-            // Apply error image when error occurs
-            applyErrorImage();
+            handleErrors(e);
         }
+    }
+
+    private void handleErrors(Exception e) {
+        if(mListener!=null)
+            mListener.onError(mImageView, e);
+
+        // Apply error image when error occurs
+        applyErrorImage();
     }
 
 
@@ -220,27 +227,43 @@ public class Zimage {
 
         // Download image from network
         NetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadTaskCallback() {
-            @Override
-            public void onDownloadCompleted(@NonNull File targetFile) {
-//                Bitmap networkBitmap
-//                if(Validator.checkBitmap(bitmap)) {
-//                    applyBitmapToImageView(bitmap);
 
-//                    DiskCacheManager.saveBitmapOnDisk(mUrl, bitmap);
-//
-//                    MemoryCacheManager.loadBitmapInMemory(mUrl, bitmap);
-//
-//                }
+
+            @Override
+            public void onDecodedBitmap(@NonNull Bitmap bitmap) {
+                try {
+                    applyBitmapToImageView(bitmap);
+                    processNextCacheLayers(bitmap);
+                } catch (Exception e) {
+                    handleErrors(e);
+                }
             }
 
             @Override
-            public void onError(Exception err) {
-
+            public void onDownloadedImage(@NonNull File outputFile) {
+                try{
+                    Bitmap bitmap = BitmapFactory.decodeFile(outputFile.getAbsolutePath());
+                    applyBitmapToImageView(bitmap);
+                    processNextCacheLayers(bitmap);
+                }
+                catch (Exception e){
+                    handleErrors(e);
+                }
             }
+
+            @Override
+            public void onError(@NonNull Exception err) {
+                handleErrors(err);
+            }
+
         });
 
+    }
 
+    private void processNextCacheLayers(Bitmap bitmap) {
+        // Todo: storage on diskcache layer
 
+        // Todo: save bitmap on memoryCacheLayer
 
     }
 
@@ -255,8 +278,9 @@ public class Zimage {
     }
 
 
-    private void applyBitmapToImageView(@NonNull Bitmap bitmap) throws Exception{
+    private void applyBitmapToImageView(@NonNull Bitmap bitmap) {
         try {
+            //scale bitmap
             mImageView.setImageBitmap(bitmap);
             if(mListener!=null)
                 mListener.onSucceed(mImageView, mUrl);

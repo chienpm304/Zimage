@@ -61,7 +61,7 @@ public class Validator {
     public static boolean checkBitmap(Bitmap bitmap) {
         //Todo: validate if bitmap is invalid
 //        return false;
-        return bitmap!=null;
+        return bitmap!=null && bitmap.getByteCount() > 0;
     }
 
 
