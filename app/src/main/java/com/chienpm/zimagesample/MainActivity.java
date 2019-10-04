@@ -8,10 +8,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.chienpm.zimage.controller.Zimage;
 import com.chienpm.zimage.network_layer.DownloadTaskCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.utils.MyUtils;

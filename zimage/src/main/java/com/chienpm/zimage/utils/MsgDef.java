@@ -11,4 +11,5 @@ public class MsgDef {
     public static final String ERR_NO_INTERNET_CONNECTION = "No Internet Connection";
     public static final String ERR_FATAL_NOT_KNOW_WHY = "We do not know it failed :(";
     public static final String ERR_WHEN_DOWNLOAD_FILE = "Error occurs when download file";
+    public static final String ERR_PERMISSION_DENIED_WRITING_FILE = "Permission denied writing files";
 }

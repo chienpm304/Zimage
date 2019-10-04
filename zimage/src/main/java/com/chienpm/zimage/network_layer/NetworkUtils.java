@@ -1,26 +1,23 @@
 package com.chienpm.zimage.network_layer;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 
-import com.chienpm.zimage.mapping.MappingManager;
+import com.chienpm.zimage.utils.MsgDef;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 public class NetworkUtils {
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-
         return cm != null &&
                 cm.getActiveNetworkInfo() != null &&
                 cm.getActiveNetworkInfo().isConnected();
     }
 
-    public static void writeStreamToFile(InputStream inputStream, File targetFile) throws IOException {
+    public static void writeStreamToFile(InputStream inputStream, File targetFile) throws Exception {
 
         try {
             FileOutputStream outStream = new FileOutputStream(targetFile);
@@ -34,9 +31,12 @@ public class NetworkUtils {
             outStream.close();
 
 
-//            BitmapFactory.de
         }catch (Exception e){
-            throw e;
+            if(e.getMessage().contains("Permission denied"))
+//            BitmapFactory.de
+                throw new Exception(MsgDef.ERR_PERMISSION_DENIED_WRITING_FILE);
+            else
+                throw e;
         }
     }
 }

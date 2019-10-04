@@ -29,7 +29,7 @@ public class NetworkLayerTest {
 
     private static final String TAG = NetworkLayerTest.class.getSimpleName();
     private Context mContext = getContext();
-    private String mUrl = "http://www.project-disco.org/wp-content/uploads/2018/04/Android-logo-1024x576.jpg";
+    public static String mUrl = "http://www.project-disco.org/wp-content/uploads/2018/04/Android-logo-1024x576.jpg";
 
 
     public Context getContext(){
