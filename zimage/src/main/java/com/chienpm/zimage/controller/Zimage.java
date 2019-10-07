@@ -43,9 +43,11 @@ public class Zimage {
     private int mLoadingResId;
     private int mErrorResId;
     private ImageView mImageView;
-    private int mWidth;
-    private int mHeight;
+//    private int mWidth;
+//    private int mHeight;
     private ZimageCallback mListener;
+
+    private NetworkManager mNetworkManager = NetworkManager.getInstance();
 
     private Zimage() {
         reset();
@@ -69,8 +71,8 @@ public class Zimage {
         mListener = null;
         mLoadingResId = R.drawable.default_loading_drawable;
         mErrorResId = R.drawable.default_error_drawable;
-        mWidth = 0;
-        mHeight = 0;
+//        mWidth = 0;
+//        mHeight = 0;
     }
 
     /**
@@ -111,8 +113,8 @@ public class Zimage {
      * @return Zimage instance to continuous builder
      */
     public Zimage resize(int width, int height){
-        this.mWidth = width;
-        this.mHeight = height;
+//        this.mWidth = width;
+//        this.mHeight = height;
         return mInstance;
     }
 
@@ -226,7 +228,7 @@ public class Zimage {
         }
 
         // Download image from network
-        NetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadTaskCallback() {
+        mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadTaskCallback() {
 
 
             @Override
@@ -293,6 +295,7 @@ public class Zimage {
 
     public interface ZimageCallback {
         void onSucceed(@NonNull ImageView imageView, @NonNull String url);
+
         void onError(@Nullable ImageView imageView, @NonNull Exception e);
 
         @VisibleForTesting

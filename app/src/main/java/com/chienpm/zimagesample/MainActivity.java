@@ -38,7 +38,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void buttonClick(View view) {
         Log.i(TAG, "onClick: "+mImageView.getLayoutParams().width+"x"+mImageView.getLayoutParams().height);
+
         String url = mEdtUrl.getText().toString();
+
+
+
         Zimage
             .getInstance()
             .with(this)
@@ -46,23 +50,23 @@ public class MainActivity extends AppCompatActivity {
             .addListener(new ZimageCallback() {
                 @Override
                 public void onSucceed(@NonNull ImageView imageView, @NonNull String url) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
                             Toast.makeText(getApplicationContext(), "Succeed: ", Toast.LENGTH_LONG).show();
-                        }
-                    });
+//                        }
+//                    });
 
                 }
 
                 @Override
                 public void onError(@Nullable ImageView imageView, @NonNull final Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
                             Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
+//                        }
+//                    });
 
                 }
 

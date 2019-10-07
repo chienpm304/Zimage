@@ -13,4 +13,5 @@ public interface DownloadTaskCallback {
     void onDecodedBitmap(@NonNull Bitmap bitmap);
 
     void onDownloadedImage(@NonNull File outputFile);
+
 }

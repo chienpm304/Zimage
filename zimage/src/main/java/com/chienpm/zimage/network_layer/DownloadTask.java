@@ -2,6 +2,7 @@ package com.chienpm.zimage.network_layer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -15,15 +16,23 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class DownloadTask implements Runnable{
+class DownloadTask implements Runnable {
 
     private static final String TAG = DownloadTask.class.getSimpleName();
-    private final String mUrlStr;
-    private final DownloadTaskCallback mCallback;
 
-    public DownloadTask(String url, DownloadTaskCallback callback) {
+    private final String mUrlStr;
+
+    private final DownloadTaskCallback mCallback;
+    private Handler mHandler = null;
+
+    private Bitmap mResultBitmap = null;
+    private File mResultOutputFile = null;
+    private Exception mResultErr = null;
+
+    public DownloadTask(String url, Handler handler, DownloadTaskCallback callback) {
         this.mUrlStr = url;
         this.mCallback = callback;
+        this.mHandler = handler;
     }
 
     @Override
@@ -75,22 +84,58 @@ class DownloadTask implements Runnable{
 
                 if(Validator.checkBitmap(bitmap)) {
 
-                    mCallback.onDecodedBitmap(bitmap);
+//                    mCallback.onDecodedBitmap(mResultBitmap);
+                    mResultBitmap = bitmap;
+                    mResultOutputFile = null;
+                    mResultErr = null;
 
                 } else {
 
                     NetworkUtils.writeStreamToFile(inputStream, outputFile);
 
-                    if(StorageUtils.checkOutputImageFile(outputFile))
-                        mCallback.onDownloadedImage(outputFile);
-                    else
-                        mCallback.onError(new Exception(MsgDef.ERR_INVALID_BITMAP));
+                    if(StorageUtils.checkOutputImageFile(outputFile)) {
+//                        mCallback.onDownloadedImage(outputFile);
+                        mResultBitmap = null;
+                        mResultOutputFile = outputFile;
+                        mResultErr = null;
+                    }
+                    else {
+                        mResultBitmap = null;
+                        mResultOutputFile = null;
+                        mResultErr = new Exception(MsgDef.ERR_INVALID_BITMAP);
+                    }
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            mCallback.onError(e);
+            mResultBitmap = null;
+            mResultOutputFile = null;
+            mResultErr = e;
+        }
+        finally {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if(mCallback !=null){
+                        if(mResultBitmap != null){
+                            mCallback.onDecodedBitmap(mResultBitmap);
+                        }
+                        else if(mResultOutputFile!=null){
+                            mCallback.onDownloadedImage(mResultOutputFile);
+                        }
+                        else if(mResultErr != null){
+                            mCallback.onError(mResultErr);
+                        }
+                        else{
+                            throw new RuntimeException("All results were null!!!!");
+                        }
+                    }
+                    else{
+                        throw new RuntimeException("DownloadTaskCallback must be passed to DownloadTask");
+                    }
+                }
+            });
         }
     }
 
