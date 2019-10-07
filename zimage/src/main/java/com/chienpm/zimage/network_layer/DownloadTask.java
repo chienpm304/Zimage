@@ -129,7 +129,9 @@ class DownloadTask implements Runnable {
                 }
             }
             else{
+
                 mResultErr = new Exception(MsgDef.CANNOT_CONNECT_TO_SERVER+". Error code: "+responseCode);
+
             }
 
         } catch (Exception e) {

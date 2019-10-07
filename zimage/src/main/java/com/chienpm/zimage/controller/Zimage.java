@@ -6,8 +6,6 @@ import android.graphics.BitmapFactory;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 import com.chienpm.zimage.R;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
@@ -189,9 +187,14 @@ public class Zimage {
         }
     }
 
+    /**
+     * Handle Errors which occur when processing
+     * Draw error bitmap on image
+     * @param e
+     */
     private void handleErrors(Exception e) {
         if(mListener!=null)
-            mListener.onError(mImageView, e);
+            mListener.onError(mImageView, mUrl, e);
 
         // Apply error image when error occurs
         applyErrorImage();
@@ -221,37 +224,44 @@ public class Zimage {
      */
     public void loadImage() throws Exception {
 
+        //Todo: recycle this bitmap
         Bitmap bitmap = null;
 
         //Try to load image from memory cache
-        bitmap = mMemoryCacheManager.getBitmapFromMemory(mUrl);
+        bitmap = mMemoryCacheManager.loadBitmap(mUrl);
 
         if(Validator.checkBitmap(bitmap)) {
+
             applyBitmapToImageView(bitmap);
+
             return;
         }
 
 
         // Try to load image from disk
-        bitmap = mDiskCacheManager.loadBitmap(mUrl);
+        bitmap = DiskCacheManager.loadBitmap(mUrl);
+        
         if(Validator.checkBitmap(bitmap)) {
+            
             applyBitmapToImageView(bitmap);
 
             // Cached bitmap loaded on memory
-            MemoryCacheManager.loadBitmapInMemory(mUrl, bitmap);
+            mMemoryCacheManager.saveBitmap(mUrl, bitmap);
 
             return;
         }
 
-        // Download image from network
+        // Fetch image from network (result in bitmap or image file)
         mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadTaskCallback() {
-
 
             @Override
             public void onDecodedBitmap(@NonNull Bitmap bitmap) {
                 try {
+
                     applyBitmapToImageView(bitmap);
-                    processNextCacheLayers(bitmap);
+
+                    processCacheOnDiskAndMemory(bitmap);
+
                 } catch (Exception e) {
                     handleErrors(e);
                 }
@@ -260,9 +270,16 @@ public class Zimage {
             @Override
             public void onDownloadedImage(@NonNull File outputFile) {
                 try{
+
                     Bitmap bitmap = BitmapFactory.decodeFile(outputFile.getAbsolutePath());
-                    applyBitmapToImageView(bitmap);
-                    processNextCacheLayers(bitmap);
+                    if(Validator.checkBitmap(bitmap)) {
+                        applyBitmapToImageView(bitmap);
+
+                        processCacheOnDiskAndMemory(bitmap);
+                    }
+                    else{
+                        handleErrors(new Exception("Cannot decode bitmap from image downloaded"));
+                    }
                 }
                 catch (Exception e){
                     handleErrors(e);
@@ -278,27 +295,43 @@ public class Zimage {
 
     }
 
-    private void processNextCacheLayers(Bitmap bitmap) {
-        // Todo: storage on diskcache layer
+    /**
+     * Try to cached bitmap fetched from NetworkLayer to DiskCache and MemoryCache
+     *
+     * @param bitmap
+     */
+    private void processCacheOnDiskAndMemory(Bitmap bitmap) {
+        // Todo: storage on diskCacheLayer
 
         // Todo: save bitmap on memoryCacheLayer
 
     }
 
 
+    /**
+     * Draw loading image on ImageView while Zimage processing
+     */
     private void applyLoadingImage() {
         ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mLoadingResId);
     }
 
 
+    /**
+     * Draw loading image on ImageView when Zimage process failed
+     */
     private void applyErrorImage() {
         ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mErrorResId);
     }
 
 
+    /**
+     * Draw bitmap fetched on ImageView
+     * @param bitmap
+     */
     private void applyBitmapToImageView(@NonNull Bitmap bitmap) {
         try {
-            //scale bitmap
+
+            //todo: scale and crop bitmap to adaptive with imageView
             mImageView.setImageBitmap(bitmap);
             if(mListener!=null)
                 mListener.onSucceed(mImageView, mUrl);
@@ -308,14 +341,5 @@ public class Zimage {
         }
     }
 
-
-    public interface ZimageCallback {
-        void onSucceed(@NonNull ImageView imageView, @NonNull String url);
-
-        void onError(@Nullable ImageView imageView, @NonNull Exception e);
-
-        @VisibleForTesting
-        boolean getResult();
-    }
 
 }

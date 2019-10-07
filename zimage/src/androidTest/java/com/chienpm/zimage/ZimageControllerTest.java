@@ -9,6 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.chienpm.zimage.controller.Zimage;
+import com.chienpm.zimage.controller.Zimage.ZimageCallback;
 import com.chienpm.zimage.utils.MsgDef;
 
 import org.junit.Test;
@@ -174,12 +175,8 @@ public class ZimageControllerTest {
         ImageView imgView = new ImageView(context);
         Exception err = null;
 
-        Zimage.ZimageCallback callback = new Zimage.ZimageCallback() {
+        ZimageCallback callback = new ZimageCallback() {
             Boolean result = null;
-
-            public boolean getResult() {
-                return result;
-            }
 
             @Override
             public void onSucceed(@NonNull ImageView imageView, @NonNull String url) {
@@ -205,8 +202,6 @@ public class ZimageControllerTest {
             err = e;
         }
 
-//        assertNull(err);
-        assertEquals(Boolean.TRUE, callback.getResult());
     }
 
 

@@ -23,6 +23,7 @@ public class DiskCacheManager {
             if(mInstance == null) {
 
                 mInstance = new DiskCacheManager();
+
                 mSync.notifyAll();
             }
 
