@@ -1,5 +1,8 @@
 package com.chienpm.zimage.utils;
 
+/**
+ * @MsgDef is a string definitions wrapper
+ */
 public class MsgDef {
     public static final String ERR_INVALID_CONTEXT = "The context passed is null";
     public static final String ERR_INVALID_IMAGE_VIEW = "The ImageView passed is invalid";

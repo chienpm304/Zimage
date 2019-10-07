@@ -20,15 +20,32 @@ class DownloadTask implements Runnable {
 
     private static final String TAG = DownloadTask.class.getSimpleName();
 
+    // The Url need to download image from
     private final String mUrlStr;
 
+    // An interface to return to which component implementing @DownloadTaskCallback interface
     private final DownloadTaskCallback mCallback;
+
+    // MainThread's looper handler: to pass to every DownloadTask instance (reducing the number of handler instances created), help return results in Mainthread
     private Handler mHandler = null;
 
+    // The bitmap instance decoded from http stream
     private Bitmap mResultBitmap = null;
+
+    // The file where image will the downloaded-image-file located on disk
     private File mResultOutputFile = null;
+
+    // Error
     private Exception mResultErr = null;
 
+
+    /**
+     * DownloadTask is a Runnable which is used to download bitmap from url and sent result when done (via DownloadTaskCallback).
+     *
+     * @param url
+     * @param handler which keeps MainThread's looper to make DownloadTask result callback will be invoked in MainThread
+     * @param callback @DownloadTaskCallback interface
+     */
     public DownloadTask(String url, Handler handler, DownloadTaskCallback callback) {
         this.mUrlStr = url;
         this.mCallback = callback;
@@ -56,19 +73,26 @@ class DownloadTask implements Runnable {
             int responseCode = httpConn.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
+
                 String disposition = httpConn.getHeaderField("Content-Disposition");
+
                 String contentType = httpConn.getContentType();
 
                 if(!TextUtils.isEmpty(disposition)){
                     // extracts file name from header field
                     int index = disposition.indexOf("filename=");
+
                     if (index > 0) {
+
                         filename = disposition.substring(index + 10,
                                 disposition.length() - 1);
+
                     }
                 } else{
+
                     // extracts file name from URL
                     filename = mUrlStr.substring(mUrlStr.lastIndexOf("/") + 1);
+
                 }
 
                 ext = filename.substring(filename.lastIndexOf('.'));
@@ -84,7 +108,6 @@ class DownloadTask implements Runnable {
 
                 if(Validator.checkBitmap(bitmap)) {
 
-//                    mCallback.onDecodedBitmap(mResultBitmap);
                     mResultBitmap = bitmap;
                     mResultOutputFile = null;
                     mResultErr = null;
@@ -94,7 +117,6 @@ class DownloadTask implements Runnable {
                     NetworkUtils.writeStreamToFile(inputStream, outputFile);
 
                     if(StorageUtils.checkOutputImageFile(outputFile)) {
-//                        mCallback.onDownloadedImage(outputFile);
                         mResultBitmap = null;
                         mResultOutputFile = outputFile;
                         mResultErr = null;
@@ -117,29 +139,57 @@ class DownloadTask implements Runnable {
             mResultErr = e;
         }
         finally {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if(mCallback !=null){
-                        if(mResultBitmap != null){
-                            mCallback.onDecodedBitmap(mResultBitmap);
-                        }
-                        else if(mResultOutputFile!=null){
-                            mCallback.onDownloadedImage(mResultOutputFile);
-                        }
-                        else if(mResultErr != null){
-                            mCallback.onError(mResultErr);
-                        }
-                        else{
-                            throw new RuntimeException("All results were null!!!!");
-                        }
+            returnResults();
+
+        }
+    }
+
+
+
+    /**
+     * Return the values (bitmaps decoded or image downloaded (may not a bitmap) or ERROR
+     * to any component which implement @DownloadTaskCall interface in MainThread.
+     *
+     * This function will throw a runtime error in these case:
+     * - Case 1: DownloadTaslCallback instance passed is null or invalid.
+     * - Case 2: No bitmap decoded (from HTTP connection inputstream), No image file downloaded from url, No error occurs while decoding and downloading.
+     */
+    private void returnResults() {
+
+        mHandler.post(new Runnable() {
+
+            @Override
+            public void run() {
+
+                if(mCallback !=null){
+
+                    if(mResultBitmap != null){
+
+                        mCallback.onDecodedBitmap(mResultBitmap);
+
+                    }
+                    else if(mResultOutputFile!=null){
+
+                        mCallback.onDownloadedImage(mResultOutputFile);
+
+                    }
+                    else if(mResultErr != null){
+
+                        mCallback.onError(mResultErr);
+
                     }
                     else{
-                        throw new RuntimeException("DownloadTaskCallback must be passed to DownloadTask");
+
+                        throw new RuntimeException("All results were null!!!!");
                     }
                 }
-            });
-        }
+                else{
+
+                    throw new RuntimeException("DownloadTaskCallback must be passed to DownloadTask");
+
+                }
+            }
+        });
     }
 
 }
