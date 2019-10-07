@@ -71,7 +71,9 @@ public class NetworkManager {
         }
     }
 
+    //Todo: destroy function must be call when render request queue is empty (Top Layer)
     public static void destroy(){
+
         synchronized (mSync) {
             if (mInstance != null) {
 
@@ -84,46 +86,12 @@ public class NetworkManager {
 
             }
             if (mHandler != null) {
+
                 //TOdo: check how to release handler
                 mHandler = null;
+
             }
         }
     }
-
-//    public static void returnToCallback(final Bitmap bitmap, final Exception e) {
-//        Message msg = new Message();
-//        msg.what = ACTION_BITMAP_DOWNLOADED;
-//        Bundle bundle = new Bundle();
-//        msg.setData(bundle);
-//        mResultHandler.sendMessage(msg);
-
-
-//       Handler handler = new Handler(Looper.getMainLooper());
-//        handler.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                if(e==null)
-//                    mCallback.onDecodedBitmap(bitmap);
-//                else
-//                    mCallback.onError(e);
-//            }
-//        });
-//    }
-
-//
-//    private static DownloadResultHandler mResultHandler = new DownloadResultHandler(Looper.getMainLooper());
-//
-//    class DownloadResultHandler extends Handler {
-//        DownloadResultHandler(Looper looper) {
-//            super(looper);
-//        }
-//        @Override
-//        public void handleMessage(@NonNull Message msg) {
-//            switch (msg.what) {
-//                case ACTION_BITMAP_DOWNLOADED:
-//                    break;
-//            }
-//        }
-//    }
 
 }

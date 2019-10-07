@@ -31,13 +31,22 @@ import java.io.File;
  */
 public class Zimage {
 
+
     public static int VERSION = 1;
 
     /* Zimage's exclusively instance*/
     private static Zimage mInstance = null;
 
-    private static Object ZSync = new Object();
+    private static NetworkManager mNetworkManager = null;
 
+    public static DiskCacheManager mDiskCacheManager = null;
+
+    public static MemoryCacheManager mMemoryCacheManager = null;
+
+    private static Object mSync = new Object();
+
+
+    // Inputs request fields
     private Context mContext;
     private String mUrl;
     private int mLoadingResId;
@@ -47,17 +56,24 @@ public class Zimage {
 //    private int mHeight;
     private ZimageCallback mListener;
 
-    private NetworkManager mNetworkManager = NetworkManager.getInstance();
+
 
     private Zimage() {
+        initManagers();
         reset();
     }
 
+    private void initManagers() {
+        mNetworkManager = NetworkManager.getInstance();
+        mDiskCacheManager = DiskCacheManager.getInstance();
+        mMemoryCacheManager = MemoryCacheManager.getInstance();
+    }
+
     public static Zimage getInstance(){
-        synchronized (ZSync) {
+        synchronized (mSync) {
             if (mInstance == null) {
                 mInstance = new Zimage();
-                ZSync.notifyAll();
+                mSync.notifyAll();
             }
         }
         return mInstance;
@@ -208,7 +224,7 @@ public class Zimage {
         Bitmap bitmap = null;
 
         //Try to load image from memory cache
-        bitmap = MemoryCacheManager.getBitmapFromMemory(mUrl);
+        bitmap = mMemoryCacheManager.getBitmapFromMemory(mUrl);
 
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
@@ -217,7 +233,7 @@ public class Zimage {
 
 
         // Try to load image from disk
-        bitmap = DiskCacheManager.loadBitmap(mUrl);
+        bitmap = mDiskCacheManager.loadBitmap(mUrl);
         if(Validator.checkBitmap(bitmap)) {
             applyBitmapToImageView(bitmap);
 

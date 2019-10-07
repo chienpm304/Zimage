@@ -13,7 +13,37 @@ import com.chienpm.zimage.mapping.MappingManager;
  */
 public class MemoryCacheManager {
 
+
+    private static MemoryCacheManager mInstance = null;
+
+    private static final Object mSync = new Object();
+
+
+    private MemoryCacheManager(){
+
+    }
+
+    public static MemoryCacheManager getInstance() {
+
+        synchronized (mSync){
+
+            if(mInstance == null) {
+
+                mInstance = new MemoryCacheManager();
+
+                mSync.notifyAll();
+
+            }
+
+        }
+
+        return  mInstance;
+    }
+
+
+
     public static Bitmap getBitmapFromMemory(@NonNull String url) {
+
         String key = MappingManager.generateMemoryKeyFromUrl(url);
 
         return null;
@@ -26,4 +56,5 @@ public class MemoryCacheManager {
         //load bitmap into memory with key access
 
     }
+
 }

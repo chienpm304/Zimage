@@ -8,6 +8,31 @@ import java.io.File;
 
 public class DiskCacheManager {
 
+    private static DiskCacheManager mInstance = null;
+
+    private static final Object mSync = new Object();
+
+    private DiskCacheManager(){
+
+    }
+
+    public static DiskCacheManager getInstance() {
+
+        synchronized (mSync){
+
+            if(mInstance == null) {
+
+                mInstance = new DiskCacheManager();
+                mSync.notifyAll();
+            }
+
+        }
+
+        return  mInstance;
+    }
+
+
+
     /**
      * @param url: Cloud Image's URL string
      * @return  the Bitmap image which loaded from disk storage
@@ -32,4 +57,6 @@ public class DiskCacheManager {
         //save bitmap to file
 
     }
+
+
 }
