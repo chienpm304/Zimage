@@ -10,7 +10,7 @@ import java.io.File;
  *  @DownloadTaskCallback interface which is used to return results from DownloadTask into Mainthread (for which component implement this interface)
  *  Expected: on of 3 methods in this interface will be invoked
  */
-public interface DownloadTaskCallback {
+public interface DownloadCallback {
 
     // Return the bitmap which decoded from URL's stream
     void onDecodedBitmap(@NonNull Bitmap bitmap);

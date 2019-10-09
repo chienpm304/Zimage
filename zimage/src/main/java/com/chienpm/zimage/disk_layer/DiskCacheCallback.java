@@ -1,10 +1,15 @@
 package com.chienpm.zimage.disk_layer;
 
+import android.graphics.Bitmap;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.io.File;
 
-public interface DiskSaveBitmapCallback {
+public interface DiskCacheCallback {
 
-    void onSucceed(File file);
+    void onSucceed(@Nullable Bitmap bitmap, @NonNull File ouput_file);
 
     void onFailed(Exception err);
 

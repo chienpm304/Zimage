@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import com.chienpm.zimage.mapping.MappingManager;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -74,6 +73,24 @@ public class DiskCacheManager {
     }
 
 
+    public void loadBitmap(final String url, @NonNull final DiskCacheCallback callback) {
+
+        if(callback != null) {
+
+            DiskLoadBitmapTask task = new DiskLoadBitmapTask(url, mHandler, callback);
+
+            mExecutor.execute(task);
+
+        }
+        else{
+
+            throw new RuntimeException("DiskCacheCallback must be not null!");
+
+        }
+
+    }
+
+
     /**
      * Save bitmap to local disk storage for next request, reducing request http request to fetch image
      * This class mapping url and system file location to save bitmap file in disk
@@ -84,44 +101,7 @@ public class DiskCacheManager {
 
         if(callback != null) {
 
-            Runnable task = new Runnable() {
-
-
-                @Override
-                public void run() {
-                    try {
-
-                        final File file = MappingManager.getFileFromURL(url);
-
-                        if (DiskUtils.checkFileIsExisted(file))
-                            file.delete();
-
-                        //save bitmap to file
-                        DiskUtils.saveBitmap(bitmap, file);
-
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onSucceed(file);
-                            }
-                        });
-
-
-                    } catch (final IOException e) {
-
-                        e.printStackTrace();
-
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onFailed(e);
-                            }
-                        });
-
-                    }
-
-                }
-            };
+            DiskSaveBitmapTask task = new DiskSaveBitmapTask(url, bitmap, mHandler, callback);
 
             mExecutor.execute(task);
         }
@@ -133,12 +113,4 @@ public class DiskCacheManager {
 
 
     }
-
-    public interface DiskCacheCallback{
-
-        void onSucceed(File file);
-
-        void onFailed(Exception err);
-    }
-
 }

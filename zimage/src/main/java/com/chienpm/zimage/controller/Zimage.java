@@ -6,13 +6,14 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.chienpm.zimage.R;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
-import com.chienpm.zimage.disk_layer.DiskCacheManager.DiskCacheCallback;
+import com.chienpm.zimage.disk_layer.DiskCacheCallback;
 import com.chienpm.zimage.disk_layer.DiskUtils;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
-import com.chienpm.zimage.network_layer.DownloadTaskCallback;
+import com.chienpm.zimage.network_layer.DownloadCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.utils.ImageUtils;
 
@@ -188,12 +189,14 @@ public class Zimage {
             validateParameters();
 
             //Todo: queue up the requests
-            loadImage();
+            loadBitmapFromMemory();
 
 
         }
         catch (Exception e){
+
             handleErrors(e);
+
         }
     }
 
@@ -203,6 +206,8 @@ public class Zimage {
      * @param e is Exception instance which contain error message.
      */
     private void handleErrors(Exception e) {
+
+        Log.i(TAG, "handleErrors: "+e.getMessage());
 
         if(mListener!=null) {
             mListener.onError(mImageView, mUrl, e);
@@ -232,51 +237,107 @@ public class Zimage {
 
 
     /***
-     *  Start to loading image processes
+     *  Try to load bitmap from memory using url key
      */
-    public void loadImage() throws Exception {
+    public void loadBitmapFromMemory() {
 
-        //Todo: recycle this bitmap
-        Bitmap bitmap = null;
+        Bitmap bitmap;
 
         //Try to load image from memory cache
         bitmap = mMemoryCacheManager.loadBitmap(mUrl);
 
         if(Validator.checkBitmap(bitmap)) {
 
-            Log.i(TAG, "loadImage: from MemoryCacheLayer");
-            applyBitmapToImageView(bitmap);
+            Log.i(TAG, "loadBitmapFromMemory: from MemoryCacheLayer");
 
-            return;
+            try {
+
+                applyBitmapToImageView(bitmap);
+
+            } catch (Exception e) {
+
+                handleErrors(e);
+
+            }
+
+        }
+        else {
+
+            loadBitmapFromDisk();
+
         }
 
+    }
+
+    /**
+     * Try to load bitmap from local disk storage using url key
+     */
+    private void loadBitmapFromDisk() {
 
         // Try to load image from disk
-        bitmap = mDiskCacheManager.loadBitmap(mUrl);
-        
-        if(Validator.checkBitmap(bitmap)) {
+        mDiskCacheManager.loadBitmap(mUrl, new DiskCacheCallback() {
 
-            Log.i(TAG, "loadImage: from DiskCacheLayer");
+            @Override
+            public void onSucceed(@Nullable Bitmap bm, @NonNull File ouputFile) {
 
-            applyBitmapToImageView(bitmap);
+                Log.i(TAG, "Load done: from DiskCacheLayer");
 
-            // Cached bitmap loaded on memory
-            mMemoryCacheManager.saveBitmap(mUrl, bitmap);
+                try {
 
-            return;
-        }
+                    applyBitmapToImageView(bm);
+
+                    // Cached bitmap loaded on memory
+                    saveBitmapOnMemory(bm);
+
+                } catch (Exception e) {
+
+                    handleErrors(e);
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onFailed(Exception err) {
+                try {
+
+                    fetchImageFromNetwork();
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+
+                    handleErrors(e);
+
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Try to fetch image from network using DownloadTask to decoded image to bitmap
+     * The bitmap result is call in DownloadTask
+     * @throws Exception when any error occur while download from network
+     */
+    private void fetchImageFromNetwork() throws Exception {
 
         // Fetch image from network (result in bitmap or image file)
-        mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadTaskCallback() {
+        mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadCallback() {
 
             @Override
             public void onDecodedBitmap(@NonNull Bitmap bitmap) {
                 try {
-                    Log.i(TAG, "loadImage from DiskCacheLayer (from STREAM");
+                    Log.i(TAG, "Load done: from NetworkLayer (from STREAM)");
 
                     applyBitmapToImageView(bitmap);
 
-                    processCacheOnDiskAndMemory(bitmap);
+                    saveBitmapOnDisk(bitmap);
+
+                    saveBitmapOnMemory(bitmap);
+
 
                 } catch (Exception e) {
 
@@ -293,11 +354,13 @@ public class Zimage {
 
                     if(Validator.checkBitmap(bitmap)) {
 
-                        Log.i(TAG, "loadImage from DiskCacheLayer (from FILE DOWNLOADED)");
+                        Log.i(TAG, "Load done: from NetworkLayer (from FILE DOWNLOADED)");
 
                         applyBitmapToImageView(bitmap);
 
-                        processCacheOnDiskAndMemory(bitmap);
+                        saveBitmapOnDisk(bitmap);
+
+                        saveBitmapOnMemory(bitmap);
 
                     }
                     else{
@@ -312,49 +375,44 @@ public class Zimage {
                 catch (Exception e){
 
                     handleErrors(e);
+
                 }
             }
 
             @Override
             public void onError(@NonNull Exception err) {
+
                 handleErrors(err);
+
             }
 
         });
+    }
+
+    private void saveBitmapOnMemory(Bitmap bitmap) {
+
+        mMemoryCacheManager.saveBitmap(mUrl, bitmap);
 
     }
 
-    /**
-     * Try to cached bitmap fetched from NetworkLayer to DiskCache and MemoryCache
-     * These 2 task are run in seperately threads
-     * @param bitmap
-     */
-    private void processCacheOnDiskAndMemory(Bitmap bitmap) {
+    private void saveBitmapOnDisk(Bitmap bitmap) {
 
-        try {
-            // Todo: storage on diskCacheLayer
-            mDiskCacheManager.saveBitmap(mUrl, bitmap, new DiskCacheCallback() {
-                @Override
-                public void onSucceed(File file) {
-                    Log.i(TAG, "onSucceed: DiskCached "+file.getAbsolutePath());
-                }
+        mDiskCacheManager.saveBitmap(mUrl, bitmap, new DiskCacheCallback() {
 
-                @Override
-                public void onFailed(Exception err) {
+            @Override
+            public void onSucceed(@NonNull Bitmap bitmap, @NonNull File file) {
 
-                    Log.e(TAG, "onError: DiskCached "+err.getMessage());
+                Log.i(TAG, "onSucceed: DiskCached "+file.getAbsolutePath());
 
-                }
-            });
+            }
 
-            // Todo: save bitmap on memoryCacheLayer
-            mMemoryCacheManager.saveBitmap(mUrl, bitmap);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            throw e;
-        }
+            @Override
+            public void onFailed(Exception err) {
 
+                Log.e(TAG, "onError: DiskCached "+err.getMessage());
+
+            }
+        });
     }
 
 
@@ -362,7 +420,9 @@ public class Zimage {
      * Draw loading image on ImageView while Zimage processing
      */
     private void applyLoadingImage() {
+
         ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mLoadingResId);
+
     }
 
 
@@ -378,7 +438,8 @@ public class Zimage {
      * Draw bitmap fetched on ImageView
      * @param bitmap
      */
-    private void applyBitmapToImageView(@NonNull Bitmap bitmap) {
+    private void applyBitmapToImageView(@NonNull Bitmap bitmap) throws Exception{
+
         try {
 
             //todo: scale and crop bitmap to adaptive with imageView
@@ -386,9 +447,12 @@ public class Zimage {
 
             if(mListener!=null)
                 mListener.onSucceed(mImageView, mUrl);
+
         }
         catch (Exception e){
+
             throw e;
+
         }
     }
 

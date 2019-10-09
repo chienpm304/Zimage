@@ -16,4 +16,5 @@ public class MsgDef {
     public static final String ERR_WHEN_DOWNLOAD_FILE = "Error occurs when download file";
     public static final String ERR_PERMISSION_DENIED_WRITING_FILE = "Permission denied writing files";
     public static final String CANNOT_CONNECT_TO_SERVER = "Cannot connect to server";
+    public static final String ERR_INVALID_FILE_CACHED = "File cached is not still exist";
 }

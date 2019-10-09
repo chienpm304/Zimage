@@ -23,8 +23,8 @@ class DownloadTask implements Runnable {
     // The Url need to download image from
     private final String mUrlStr;
 
-    // An interface to return to which component implementing @DownloadTaskCallback interface
-    private final DownloadTaskCallback mCallback;
+    // An interface to return to which component implementing @DownloadCallback interface
+    private final DownloadCallback mCallback;
 
     // MainThread's looper handler: to pass to every DownloadTask instance (reducing the number of handler instances created), help return results in Mainthread
     private Handler mHandler = null;
@@ -40,13 +40,13 @@ class DownloadTask implements Runnable {
 
 
     /**
-     * DownloadTask is a Runnable which is used to download bitmap from url and sent result when done (via DownloadTaskCallback).
+     * DownloadTask is a Runnable which is used to download bitmap from url and sent result when done (via DownloadCallback).
      *
      * @param url
      * @param handler which keeps MainThread's looper to make DownloadTask result callback will be invoked in MainThread
-     * @param callback @DownloadTaskCallback interface
+     * @param callback @DownloadCallback interface
      */
-    public DownloadTask(String url, Handler handler, DownloadTaskCallback callback) {
+    public DownloadTask(String url, Handler handler, DownloadCallback callback) {
         this.mUrlStr = url;
         this.mCallback = callback;
         this.mHandler = handler;
@@ -188,7 +188,7 @@ class DownloadTask implements Runnable {
                 }
                 else{
 
-                    throw new RuntimeException("DownloadTaskCallback must be passed to DownloadTask");
+                    throw new RuntimeException("DownloadCallback must be passed to DownloadTask");
 
                 }
             }

@@ -8,8 +8,8 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 
 import com.chienpm.zimage.R;
-import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.disk_layer.DiskCacheCallback;
+import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.disk_layer.DiskUtils;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
 import com.chienpm.zimage.network_layer.DownloadCallback;
@@ -29,14 +29,14 @@ import java.io.File;
  *              ...
  *              .into(ImageView)
  */
-public class Zimage {
+public class Zimage_bk {
 
 
-    public static final String TAG = Zimage.class.getSimpleName();
+    public static final String TAG = Zimage_bk.class.getSimpleName();
     public static int VERSION = 1;
 
     /* Zimage's exclusively instance*/
-    private static Zimage mInstance = null;
+    private static Zimage_bk mInstance = null;
 
     private static NetworkManager mNetworkManager = null;
 
@@ -61,7 +61,7 @@ public class Zimage {
     /**
      * Hidden Zimage constructor to deny user creating Zimage instances, use only one.
      */
-    private Zimage() {
+    private Zimage_bk() {
         initManagers();
         reset();
     }
@@ -74,10 +74,10 @@ public class Zimage {
     }
 
 
-    public static Zimage getInstance(){
+    public static Zimage_bk getInstance(){
         synchronized (mSync) {
             if (mInstance == null) {
-                mInstance = new Zimage();
+                mInstance = new Zimage_bk();
                 mSync.notifyAll();
             }
         }
@@ -101,7 +101,7 @@ public class Zimage {
      * @param context of Activity
      * @return Zimage instance to continuous builder
      */
-    public Zimage with(Context context){
+    public Zimage_bk with(Context context){
         this.mContext = context;
         return this;
     }
@@ -111,7 +111,7 @@ public class Zimage {
      * @param url: Image string url need to display
      * @return Zimage instance to continuous builder
      */
-    public Zimage from(@NonNull String url) {
+    public Zimage_bk from(@NonNull String url) {
         this.mUrl = url;
         return mInstance;
     }
@@ -121,7 +121,7 @@ public class Zimage {
      * @param listener
      * @return
      */
-    public Zimage addListener(@NonNull ZimageCallback listener){
+    public Zimage_bk addListener(@NonNull ZimageCallback listener){
         this.mListener = listener;
         return mInstance;
     }
@@ -133,7 +133,7 @@ public class Zimage {
      * @param height is new height to scale
      * @return Zimage instance to continuous builder
      */
-    public Zimage resize(int width, int height){
+    public Zimage_bk resize(int width, int height){
 //        this.mWidth = width;
 //        this.mHeight = height;
         return mInstance;
@@ -144,7 +144,7 @@ public class Zimage {
      * @param resId is the Resource which will be render on ImageView while loading
      * @return Zimage instance to continuous builder
      */
-    public Zimage loadingResourceId(@NonNull int resId){
+    public Zimage_bk loadingResourceId(@NonNull int resId){
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_loading_drawable;
 
@@ -159,7 +159,7 @@ public class Zimage {
      * @param resId is the Resource which will be render on ImageView when loading failed
      * @return Zimage instance to continuous builder
      */
-    public Zimage errorResId(@NonNull int resId){
+    public Zimage_bk errorResId(@NonNull int resId){
 
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_error_drawable;
@@ -237,42 +237,30 @@ public class Zimage {
     public void loadImage() throws Exception {
 
         //Todo: recycle this bitmap
-        final Bitmap[] bitmap = {null};
+        Bitmap bitmap = null;
 
         //Try to load image from memory cache
-        bitmap[0] = mMemoryCacheManager.loadBitmap(mUrl);
+        bitmap = mMemoryCacheManager.loadBitmap(mUrl);
 
-        if(Validator.checkBitmap(bitmap[0])) {
+        if(Validator.checkBitmap(bitmap)) {
 
-            Log.i(TAG, "loadImage: from MemoryCacheLayer");
-            applyBitmapToImageView(bitmap[0]);
+            Log.i(TAG, "loadBitmapFromMemory: from MemoryCacheLayer");
+            applyBitmapToImageView(bitmap);
 
             return;
         }
 
 
         // Try to load image from disk
-        mDiskCacheManager.loadBitmap(mUrl, new DiskCacheCallback() {
-
-            @Override
-            public void onSucceed(@NonNull Bitmap bm, @NonNull File ouput_file) {
-                bitmap[0] = bm.copy(bm.getConfig(), true);
-                bm.recycle();
-            }
-
-            @Override
-            public void onFailed(Exception err) {
-
-            }
-        });
+        bitmap = mDiskCacheManager.loadBitmap(mUrl);
         
-        if(Validator.checkBitmap(bitmap[0])) {
+        if(Validator.checkBitmap(bitmap)) {
 
-            Log.i(TAG, "loadImage: from DiskCacheLayer");
-            applyBitmapToImageView(bitmap[0]);
+            Log.i(TAG, "loadBitmapFromMemory: from DiskCacheLayer");
+            applyBitmapToImageView(bitmap);
 
             // Cached bitmap loaded on memory
-            mMemoryCacheManager.saveBitmap(mUrl, bitmap[0]);
+            mMemoryCacheManager.saveBitmap(mUrl, bitmap);
 
             return;
         }
@@ -283,7 +271,7 @@ public class Zimage {
             @Override
             public void onDecodedBitmap(@NonNull Bitmap bitmap) {
                 try {
-                    Log.i(TAG, "loadImage from NetworkLayer (from STREAM)");
+                    Log.i(TAG, "loadBitmapFromMemory from NetworkLayer (from STREAM)");
 
                     applyBitmapToImageView(bitmap);
 
@@ -304,7 +292,7 @@ public class Zimage {
 
                     if(Validator.checkBitmap(bitmap)) {
 
-                        Log.i(TAG, "loadImage from NetworkLayer (from FILE DOWNLOADED)");
+                        Log.i(TAG, "loadBitmapFromMemory from NetworkLayer (from FILE DOWNLOADED)");
 
                         applyBitmapToImageView(bitmap);
 

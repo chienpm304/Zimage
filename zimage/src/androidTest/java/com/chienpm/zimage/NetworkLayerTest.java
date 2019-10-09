@@ -12,7 +12,7 @@ import androidx.test.runner.AndroidJUnit4;
 
 import com.chienpm.zimage.controller.Zimage;
 import com.chienpm.zimage.controller.ZimageCallback;
-import com.chienpm.zimage.network_layer.DownloadTaskCallback;
+import com.chienpm.zimage.network_layer.DownloadCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.network_layer.NetworkUtils;
 import com.chienpm.zimage.utils.MsgDef;
@@ -82,7 +82,7 @@ public class NetworkLayerTest {
 
         try {
             NetworkManager.getInstance().
-                    downloadFileFromURL(mContext, url3, new DownloadTaskCallback() {
+                    downloadFileFromURL(mContext, url3, new DownloadCallback() {
                 @Override
                 public void onError(@NonNull final Exception err) {
                     Log.e(TAG, "onError: ",err);

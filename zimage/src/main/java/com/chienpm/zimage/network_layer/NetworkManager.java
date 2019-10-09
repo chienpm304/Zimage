@@ -53,7 +53,7 @@ public class NetworkManager {
     }
 
 
-    public void downloadFileFromURL(final Context context, String url, final DownloadTaskCallback callback) throws Exception {
+    public void downloadFileFromURL(final Context context, String url, final DownloadCallback callback) throws Exception {
 
         if(callback!=null) {
 
@@ -73,7 +73,7 @@ public class NetworkManager {
         }
         else{
 
-            throw new RuntimeException("DownloadTaskCallback must be not null!");
+            throw new RuntimeException("DownloadCallback must be not null!");
 
         }
     }
