@@ -11,8 +11,8 @@ import java.io.File;
  */
 public class MappingManager {
 
-    public static String generateMemoryKeyFromUrl(String url) {
-        return "111";
+    public static String getKeyFromUrl(String url) {
+        return String.valueOf(url.hashCode());
     }
 
     /**

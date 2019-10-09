@@ -22,7 +22,21 @@ public class MemoryCacheManager {
     private static final Object mSync = new Object();
 
 
+
     private MemoryCacheManager(){
+        final int maxMemory = (int) (Runtime.getRuntime().maxMemory()/1024);
+
+        // Use 1/8th of the available memory for this memory cache.
+        final int cacheSize = maxMemory / 8;
+
+        mBitmapCache = new LruCache<String, Bitmap>(cacheSize){
+
+            @Override
+          protected int sizeOf(String key, Bitmap bitmap){
+              return bitmap.getByteCount()/1024;
+          }
+
+        };
     }
 
     public static MemoryCacheManager getInstance() {
@@ -46,16 +60,20 @@ public class MemoryCacheManager {
 
     public Bitmap loadBitmap(@NonNull String url) {
 
-        String key = MappingManager.generateMemoryKeyFromUrl(url);
+        String key = MappingManager.getKeyFromUrl(url);
 
-        return null;
+        return mBitmapCache.get(key);
+
     }
 
     public void saveBitmap(String url, Bitmap bitmap) {
 
-        String key = MappingManager.generateMemoryKeyFromUrl(url);
+        if(loadBitmap(url)==null){
 
-        //load bitmap into memory with key access
+            String key = MappingManager.getKeyFromUrl(url);
+            mBitmapCache.put(key, bitmap);
+
+        }
 
     }
 
