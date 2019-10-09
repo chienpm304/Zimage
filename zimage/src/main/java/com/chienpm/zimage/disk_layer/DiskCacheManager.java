@@ -6,9 +6,6 @@ import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
-import com.chienpm.zimage.mapping.MappingManager;
-
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -58,19 +55,19 @@ public class DiskCacheManager {
      *          or NULL if the image has not cached on disk yet
      * @Note: do not throw exception for next request cache layer
      */
-    public Bitmap loadBitmap(String url) {
-
-        File file = MappingManager.getFileFromURL(url);
-
-        // check if the image is existed on disk or not
-        if(DiskUtils.checkFileIsExisted(file)){
-
-            return DiskUtils.loadBitmapFromFile(file);
-
-        }
-
-        return null;
-    }
+//    public Bitmap loadBitmap(String url) {
+//
+//        File file = MappingManager.getFileFromURL(url);
+//
+//        // check if the image is existed on disk or not
+//        if(DiskUtils.checkFileIsExisted(file)){
+//
+//            return DiskUtils.loadBitmapFromFile(file);
+//
+//        }
+//
+//        return null;
+//    }
 
 
     public void loadBitmap(final String url, @NonNull final DiskCacheCallback callback) {

@@ -9,9 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.chienpm.zimage.R;
-import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.disk_layer.DiskCacheCallback;
-import com.chienpm.zimage.disk_layer.DiskUtils;
+import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
 import com.chienpm.zimage.network_layer.DownloadCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
@@ -188,7 +187,6 @@ public class Zimage {
 
             validateParameters();
 
-            //Todo: queue up the requests
             loadBitmapFromMemory();
 
 
@@ -210,8 +208,11 @@ public class Zimage {
         Log.i(TAG, "handleErrors: "+e.getMessage());
 
         if(mListener!=null) {
+
             mListener.onError(mImageView, mUrl, e);
+
         }
+
         // Apply error image when error occurs
         applyErrorImage();
 
@@ -328,9 +329,11 @@ public class Zimage {
         mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadCallback() {
 
             @Override
-            public void onDecodedBitmap(@NonNull Bitmap bitmap) {
+            public void onSucceed(@NonNull Bitmap bitmap) {
+
                 try {
-                    Log.i(TAG, "Load done: from NetworkLayer (from STREAM)");
+
+                    Log.i(TAG, "Load done: from NetworkLayer");
 
                     applyBitmapToImageView(bitmap);
 
@@ -346,41 +349,7 @@ public class Zimage {
             }
 
             @Override
-            public void onDownloadedImage(@NonNull File outputFile) {
-
-                try{
-
-                    Bitmap bitmap = DiskUtils.loadBitmapFromFile(outputFile);
-
-                    if(Validator.checkBitmap(bitmap)) {
-
-                        Log.i(TAG, "Load done: from NetworkLayer (from FILE DOWNLOADED)");
-
-                        applyBitmapToImageView(bitmap);
-
-                        saveBitmapOnDisk(bitmap);
-
-                        saveBitmapOnMemory(bitmap);
-
-                    }
-                    else{
-
-                        handleErrors(new Exception("Cannot decode bitmap from image downloaded"));
-
-                    }
-
-                    outputFile.delete();
-
-                }
-                catch (Exception e){
-
-                    handleErrors(e);
-
-                }
-            }
-
-            @Override
-            public void onError(@NonNull Exception err) {
+            public void onFailed(@NonNull Exception err) {
 
                 handleErrors(err);
 
@@ -409,7 +378,7 @@ public class Zimage {
             @Override
             public void onFailed(Exception err) {
 
-                Log.e(TAG, "onError: DiskCached "+err.getMessage());
+                Log.e(TAG, "onFailed: DiskCached "+err.getMessage());
 
             }
         });
@@ -430,7 +399,9 @@ public class Zimage {
      * Draw loading image on ImageView when Zimage process failed
      */
     private void applyErrorImage() {
+
         ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mErrorResId);
+
     }
 
 
@@ -441,6 +412,8 @@ public class Zimage {
     private void applyBitmapToImageView(@NonNull Bitmap bitmap) throws Exception{
 
         try {
+
+            Log.i(TAG, "bitmap size: "+bitmap.getByteCount()/1024+" kB");
 
             //todo: scale and crop bitmap to adaptive with imageView
             mImageView.setImageBitmap(bitmap);

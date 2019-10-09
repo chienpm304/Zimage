@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 
 /**
  * Zimage listener is an optional while building
- * Invoke to 2 methods: @onSucceed and @onError
+ * Invoke to 2 methods: @onSucceed and @onFailed
  */
 public interface ZimageCallback {
 

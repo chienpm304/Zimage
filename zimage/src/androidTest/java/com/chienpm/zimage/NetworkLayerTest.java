@@ -84,15 +84,15 @@ public class NetworkLayerTest {
             NetworkManager.getInstance().
                     downloadFileFromURL(mContext, url3, new DownloadCallback() {
                 @Override
-                public void onError(@NonNull final Exception err) {
-                    Log.e(TAG, "onError: ",err);
-                    System.out.println("onError: "+err.getMessage());
+                public void onFailed(@NonNull final Exception err) {
+                    Log.e(TAG, "onFailed: ",err);
+                    System.out.println("onFailed: "+err.getMessage());
                 }
 
                 @Override
-                public void onDecodedBitmap(@NonNull final Bitmap bitmap) {
-                    Log.i(TAG, "onDecodedBitmap");
-                    System.out.println("onDecodedBitmap from stream - data: "+bitmap.getByteCount() +" bytes");
+                public void onSucceed(@NonNull final Bitmap bitmap) {
+                    Log.i(TAG, "onSucceed");
+                    System.out.println("onSucceed from stream - data: "+bitmap.getByteCount() +" bytes");
                 }
 
                 @Override

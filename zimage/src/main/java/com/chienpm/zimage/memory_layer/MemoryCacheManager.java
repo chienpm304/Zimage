@@ -1,6 +1,7 @@
 package com.chienpm.zimage.memory_layer;
 
 import android.graphics.Bitmap;
+import android.util.LruCache;
 
 import androidx.annotation.NonNull;
 
@@ -14,13 +15,14 @@ import com.chienpm.zimage.mapping.MappingManager;
 public class MemoryCacheManager {
 
 
+    private static LruCache<String, Bitmap> mBitmapCache;
+
     private static MemoryCacheManager mInstance = null;
 
     private static final Object mSync = new Object();
 
 
     private MemoryCacheManager(){
-
     }
 
     public static MemoryCacheManager getInstance() {

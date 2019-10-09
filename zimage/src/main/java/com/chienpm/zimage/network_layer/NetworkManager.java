@@ -65,7 +65,7 @@ public class NetworkManager {
 
             } else {
 
-                callback.onError(new Exception(MsgDef.ERR_NO_INTERNET_CONNECTION));
+                callback.onFailed(new Exception(MsgDef.ERR_NO_INTERNET_CONNECTION));
 
                 throw new Exception(MsgDef.ERR_NO_INTERNET_CONNECTION);
 

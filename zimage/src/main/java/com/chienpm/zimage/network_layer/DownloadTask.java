@@ -33,7 +33,7 @@ class DownloadTask implements Runnable {
     private Bitmap mResultBitmap = null;
 
     // The file where image will the downloaded-image-file located on disk
-    private File mResultOutputFile = null;
+//    private File mResultOutputFile = null;
 
     // Error
     private Exception mResultErr = null;
@@ -109,21 +109,25 @@ class DownloadTask implements Runnable {
                 if(Validator.checkBitmap(bitmap)) {
 
                     mResultBitmap = bitmap;
-                    mResultOutputFile = null;
+//                    mResultOutputFile = null;
                     mResultErr = null;
 
                 } else {
 
                     NetworkUtils.writeStreamToFile(inputStream, outputFile);
 
-                    if(DiskUtils.checkFileIsExisted(outputFile)) {
-                        mResultBitmap = null;
-                        mResultOutputFile = outputFile;
+                    bitmap = DiskUtils.loadBitmapFromFile(outputFile);
+
+                    outputFile.delete();
+
+                    if(Validator.checkBitmap(bitmap)) {
+                        mResultBitmap = bitmap;
+//                        mResultOutputFile = outputFile;
                         mResultErr = null;
                     }
                     else {
                         mResultBitmap = null;
-                        mResultOutputFile = null;
+//                        mResultOutputFile = null;
                         mResultErr = new Exception(MsgDef.ERR_INVALID_BITMAP);
                     }
                 }
@@ -137,7 +141,7 @@ class DownloadTask implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
             mResultBitmap = null;
-            mResultOutputFile = null;
+//            mResultOutputFile = null;
             mResultErr = e;
         }
         finally {
@@ -166,19 +170,19 @@ class DownloadTask implements Runnable {
 
                 if(mCallback !=null){
 
-                    if(mResultBitmap != null){
+                    if(Validator.checkBitmap(mResultBitmap)){
 
-                        mCallback.onDecodedBitmap(mResultBitmap);
-
-                    }
-                    else if(mResultOutputFile!=null){
-
-                        mCallback.onDownloadedImage(mResultOutputFile);
+                        mCallback.onSucceed(mResultBitmap);
 
                     }
+//                    else if(mResultOutputFile!=null){
+//
+//                        mCallback.onDownloadedImage(mResultOutputFile);
+//
+//                    }
                     else if(mResultErr != null){
 
-                        mCallback.onError(mResultErr);
+                        mCallback.onFailed(mResultErr);
 
                     }
                     else{
