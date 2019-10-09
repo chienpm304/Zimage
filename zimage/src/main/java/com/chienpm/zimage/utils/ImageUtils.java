@@ -43,4 +43,5 @@ public class ImageUtils {
     public static void inflateDrawableOverImageView(Context context, ImageView imageView, int drawable) {
         imageView.setImageResource(drawable);
     }
+
 }

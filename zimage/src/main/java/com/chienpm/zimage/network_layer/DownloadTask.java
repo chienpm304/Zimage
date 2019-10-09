@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.chienpm.zimage.controller.Validator;
-import com.chienpm.zimage.disk_layer.StorageUtils;
+import com.chienpm.zimage.disk_layer.DiskUtils;
 import com.chienpm.zimage.mapping.MappingManager;
 import com.chienpm.zimage.utils.MsgDef;
 
@@ -97,7 +97,7 @@ class DownloadTask implements Runnable {
 
                 ext = filename.substring(filename.lastIndexOf('.'));
 
-                outputFile = MappingManager.generateTemporaryFileFromUrl(mUrlStr, ext);
+                outputFile = MappingManager.getTemporaryFileFromUrl(mUrlStr, ext);
 
                 Log.i(TAG, "outputPath: "+outputFile.getAbsolutePath());
 
@@ -116,7 +116,7 @@ class DownloadTask implements Runnable {
 
                     NetworkUtils.writeStreamToFile(inputStream, outputFile);
 
-                    if(StorageUtils.checkOutputImageFile(outputFile)) {
+                    if(DiskUtils.checkFileIsExisted(outputFile)) {
                         mResultBitmap = null;
                         mResultOutputFile = outputFile;
                         mResultErr = null;
@@ -141,6 +141,7 @@ class DownloadTask implements Runnable {
             mResultErr = e;
         }
         finally {
+
             returnResults();
 
         }

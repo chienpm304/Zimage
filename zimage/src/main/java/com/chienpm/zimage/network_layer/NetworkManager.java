@@ -13,7 +13,7 @@ public class NetworkManager {
 
     private static NetworkManager mInstance = null;
 
-    private static ExecutorService mPool = null;
+    private static ExecutorService mExecutor = null;
 
     private static Handler mHandler = null;
 
@@ -28,7 +28,7 @@ public class NetworkManager {
 
     private void initFields() {
 
-        mPool = Executors.newFixedThreadPool(4);
+        mExecutor = Executors.newFixedThreadPool(4);
 
         mHandler = new Handler(Looper.getMainLooper());
 
@@ -42,6 +42,8 @@ public class NetworkManager {
             if(mInstance==null) {
 
                 mInstance = new NetworkManager();
+
+                mSync.notifyAll();
 
             }
 
@@ -59,7 +61,7 @@ public class NetworkManager {
 
                 DownloadTask task = new DownloadTask(url, mHandler, callback);
 
-                mPool.execute(task);
+                mExecutor.execute(task);
 
             } else {
 
@@ -68,6 +70,11 @@ public class NetworkManager {
                 throw new Exception(MsgDef.ERR_NO_INTERNET_CONNECTION);
 
             }
+        }
+        else{
+
+            throw new RuntimeException("DownloadTaskCallback must be not null!");
+
         }
     }
 
@@ -80,9 +87,9 @@ public class NetworkManager {
                 mInstance = null;
 
             }
-            if (mPool != null && !mPool.isShutdown()) {
+            if (mExecutor != null && !mExecutor.isShutdown()) {
 
-                mPool.shutdown();
+                mExecutor.shutdown();
 
             }
             if (mHandler != null) {

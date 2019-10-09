@@ -2,13 +2,15 @@ package com.chienpm.zimage.controller;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
 import com.chienpm.zimage.R;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
+import com.chienpm.zimage.disk_layer.DiskCacheManager.DiskCacheCallback;
+import com.chienpm.zimage.disk_layer.DiskUtils;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
 import com.chienpm.zimage.network_layer.DownloadTaskCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
@@ -30,6 +32,7 @@ import java.io.File;
 public class Zimage {
 
 
+    public static final String TAG = Zimage.class.getSimpleName();
     public static int VERSION = 1;
 
     /* Zimage's exclusively instance*/
@@ -37,9 +40,9 @@ public class Zimage {
 
     private static NetworkManager mNetworkManager = null;
 
-    public static DiskCacheManager mDiskCacheManager = null;
+    private static DiskCacheManager mDiskCacheManager = null;
 
-    public static MemoryCacheManager mMemoryCacheManager = null;
+    private static MemoryCacheManager mMemoryCacheManager = null;
 
     private static Object mSync = new Object();
 
@@ -55,17 +58,21 @@ public class Zimage {
     private ZimageCallback mListener;
 
 
-
+    /**
+     * Hidden Zimage constructor to deny user creating Zimage instances, use only one.
+     */
     private Zimage() {
         initManagers();
         reset();
     }
+
 
     private void initManagers() {
         mNetworkManager = NetworkManager.getInstance();
         mDiskCacheManager = DiskCacheManager.getInstance();
         mMemoryCacheManager = MemoryCacheManager.getInstance();
     }
+
 
     public static Zimage getInstance(){
         synchronized (mSync) {
@@ -153,6 +160,7 @@ public class Zimage {
      * @return Zimage instance to continuous builder
      */
     public Zimage errorResId(@NonNull int resId){
+
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_error_drawable;
 
@@ -170,6 +178,7 @@ public class Zimage {
      *
      */
     public void into(@NonNull ImageView imageView){
+
         this.mImageView = imageView;
 
         try {
@@ -177,6 +186,7 @@ public class Zimage {
             applyLoadingImage();
 
             validateParameters();
+
             //Todo: queue up the requests
             loadImage();
 
@@ -190,14 +200,16 @@ public class Zimage {
     /**
      * Handle Errors which occur when processing
      * Draw error bitmap on image
-     * @param e
+     * @param e is Exception instance which contain error message.
      */
     private void handleErrors(Exception e) {
-        if(mListener!=null)
-            mListener.onError(mImageView, mUrl, e);
 
+        if(mListener!=null) {
+            mListener.onError(mImageView, mUrl, e);
+        }
         // Apply error image when error occurs
         applyErrorImage();
+
     }
 
 
@@ -232,6 +244,7 @@ public class Zimage {
 
         if(Validator.checkBitmap(bitmap)) {
 
+            Log.i(TAG, "loadImage: from MemoryCacheLayer");
             applyBitmapToImageView(bitmap);
 
             return;
@@ -239,10 +252,12 @@ public class Zimage {
 
 
         // Try to load image from disk
-        bitmap = DiskCacheManager.loadBitmap(mUrl);
+        bitmap = mDiskCacheManager.loadBitmap(mUrl);
         
         if(Validator.checkBitmap(bitmap)) {
-            
+
+            Log.i(TAG, "loadImage: from DiskCacheLayer");
+
             applyBitmapToImageView(bitmap);
 
             // Cached bitmap loaded on memory
@@ -257,31 +272,45 @@ public class Zimage {
             @Override
             public void onDecodedBitmap(@NonNull Bitmap bitmap) {
                 try {
+                    Log.i(TAG, "loadImage from DiskCacheLayer (from STREAM");
 
                     applyBitmapToImageView(bitmap);
 
                     processCacheOnDiskAndMemory(bitmap);
 
                 } catch (Exception e) {
+
                     handleErrors(e);
                 }
             }
 
             @Override
             public void onDownloadedImage(@NonNull File outputFile) {
+
                 try{
 
-                    Bitmap bitmap = BitmapFactory.decodeFile(outputFile.getAbsolutePath());
+                    Bitmap bitmap = DiskUtils.loadBitmapFromFile(outputFile);
+
                     if(Validator.checkBitmap(bitmap)) {
+
+                        Log.i(TAG, "loadImage from DiskCacheLayer (from FILE DOWNLOADED)");
+
                         applyBitmapToImageView(bitmap);
 
                         processCacheOnDiskAndMemory(bitmap);
+
                     }
                     else{
+
                         handleErrors(new Exception("Cannot decode bitmap from image downloaded"));
+
                     }
+
+                    outputFile.delete();
+
                 }
                 catch (Exception e){
+
                     handleErrors(e);
                 }
             }
@@ -297,13 +326,34 @@ public class Zimage {
 
     /**
      * Try to cached bitmap fetched from NetworkLayer to DiskCache and MemoryCache
-     *
+     * These 2 task are run in seperately threads
      * @param bitmap
      */
     private void processCacheOnDiskAndMemory(Bitmap bitmap) {
-        // Todo: storage on diskCacheLayer
 
-        // Todo: save bitmap on memoryCacheLayer
+        try {
+            // Todo: storage on diskCacheLayer
+            mDiskCacheManager.saveBitmap(mUrl, bitmap, new DiskCacheCallback() {
+                @Override
+                public void onSucceed(File file) {
+                    Log.i(TAG, "onSucceed: DiskCached "+file.getAbsolutePath());
+                }
+
+                @Override
+                public void onFailed(Exception err) {
+
+                    Log.e(TAG, "onError: DiskCached "+err.getMessage());
+
+                }
+            });
+
+            // Todo: save bitmap on memoryCacheLayer
+            mMemoryCacheManager.saveBitmap(mUrl, bitmap);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
 
     }
 
@@ -333,6 +383,7 @@ public class Zimage {
 
             //todo: scale and crop bitmap to adaptive with imageView
             mImageView.setImageBitmap(bitmap);
+
             if(mListener!=null)
                 mListener.onSucceed(mImageView, mUrl);
         }

@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.chienpm.zimage.controller.Zimage;
+import com.chienpm.zimage.controller.ZimageCallback;
 import com.chienpm.zimage.network_layer.DownloadTaskCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.network_layer.NetworkUtils;
@@ -52,21 +53,17 @@ public class NetworkLayerTest {
     public void testNoConnectThrowException(){
         ImageView mImageView = new ImageView(mContext);
 
-        Zimage.ZimageCallback callback = new Zimage.ZimageCallback() {
+        ZimageCallback callback = new ZimageCallback() {
             @Override
             public void onSucceed(@NonNull ImageView imageView, @NonNull String url) {
 
             }
 
             @Override
-            public void onError(@Nullable ImageView imageView, @NonNull Exception e) {
+            public void onError(@Nullable ImageView imageView, String url, @NonNull Exception e) {
                 assertEquals(MsgDef.ERR_NO_INTERNET_CONNECTION, e.getMessage());
             }
 
-            @Override
-            public boolean getResult() {
-                return false;
-            }
         };
 
         Zimage.getInstance().with(mContext).from(mUrl).addListener(callback).into(mImageView);

@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
         mContext = getApplicationContext();
         mEdtUrl = findViewById(R.id.edtURL);
+        mEdtUrl.setText("https://cdn.wallpaper.com/main/styles/fp_820x503/s3/2019/10/_l_goldsmith-street_5627ctim-crocker.jpg");
         mImageView = findViewById(R.id.imageView);
 
         Log.i(TAG, "onCreate: "+mImageView.getLayoutParams().width+"x"+mImageView.getLayoutParams().height);

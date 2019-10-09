@@ -9,7 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.chienpm.zimage.controller.Zimage;
-import com.chienpm.zimage.controller.Zimage.ZimageCallback;
+import com.chienpm.zimage.controller.ZimageCallback;
 import com.chienpm.zimage.utils.MsgDef;
 
 import org.junit.Test;
@@ -184,9 +184,10 @@ public class ZimageControllerTest {
             }
 
             @Override
-            public void onError(@Nullable ImageView imageView, @NonNull Exception e) {
-                result = Boolean.FALSE;
+            public void onError(@Nullable ImageView imageView, String url, @NonNull Exception e) {
+
             }
+
         };
 
 

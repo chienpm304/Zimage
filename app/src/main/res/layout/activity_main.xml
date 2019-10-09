@@ -26,9 +26,9 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:scaleType="fitXY"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="center"
         android:background="@android:color/darker_gray"
         android:layout_centerInParent="true"
         android:src="@drawable/abc_vector_test"

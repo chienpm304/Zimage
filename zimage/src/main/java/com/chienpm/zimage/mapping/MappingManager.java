@@ -2,7 +2,7 @@ package com.chienpm.zimage.mapping;
 
 import android.os.Environment;
 
-import com.chienpm.zimage.disk_layer.StorageUtils;
+import com.chienpm.zimage.disk_layer.DiskUtils;
 
 import java.io.File;
 
@@ -20,30 +20,54 @@ public class MappingManager {
      * @param url
      * @return the temporary file path to download temporary image without extension
      */
-    public static File generateTemporaryFileFromUrl(String url, String extension) {
+    public static File getTemporaryFileFromUrl(String url, String extension) {
+
         String file_name = String.valueOf(url.hashCode()) + extension;
 
-        return new File(getBaseDir(), file_name);
+        File root = new File(getBaseDir(), "tmp");
+
+        if(!root.exists())
+            root.mkdirs();
+
+        return new File(root, file_name);
+
     }
 
-    public static File getLocalFileFromURL(String url) {
-        return null;
+
+    public static File getFileFromURL(String url) {
+
+        String file_name = String.valueOf(url.hashCode()) + ".jpg";
+
+        File root = new File(getBaseDir(), "cache"+File.separator+"images");
+
+        if(!root.exists())
+            root.mkdirs();
+
+        return new File(root, file_name);
+
     }
 
 
     public static File getBaseDir(){
 
         File root;
-        if(StorageUtils.checkExternalStorageAvailable()){
+
+        if(DiskUtils.checkExternalStorageAvailable()){
+
             root = new File(Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_PICTURES), "Zimage");
+
         }
         else{
+
             root = new File(Environment.getDataDirectory(), "Zimage");
+
         }
 
         if(!root.exists()) {
+
             root.mkdirs();
+
         }
 
 
