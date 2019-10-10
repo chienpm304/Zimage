@@ -53,7 +53,7 @@ public class NetworkManager {
     }
 
 
-    public void downloadFileFromURL(final Context context, String url, final DownloadCallback callback) throws Exception {
+    public void downloadFileFromURL(final Context context, String url, final DownloadCallback callback)  {
 
         if(callback!=null) {
 
@@ -66,8 +66,6 @@ public class NetworkManager {
             } else {
 
                 callback.onFailed(new Exception(MsgDef.ERR_NO_INTERNET_CONNECTION));
-
-                throw new Exception(MsgDef.ERR_NO_INTERNET_CONNECTION);
 
             }
         }

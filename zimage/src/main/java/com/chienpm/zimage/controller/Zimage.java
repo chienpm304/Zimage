@@ -321,9 +321,8 @@ public class Zimage {
     /**
      * Try to fetch image from network using DownloadTask to decoded image to bitmap
      * The bitmap result is call in DownloadTask
-     * @throws Exception when any error occur while download from network
      */
-    private void fetchImageFromNetwork() throws Exception {
+    private void fetchImageFromNetwork() {
 
         // Fetch image from network (result in bitmap or image file)
         mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadCallback() {
@@ -331,21 +330,14 @@ public class Zimage {
             @Override
             public void onSucceed(@NonNull Bitmap bitmap) {
 
-                try {
+                Log.i(TAG, "Load done: from NetworkLayer");
 
-                    Log.i(TAG, "Load done: from NetworkLayer");
+                applyBitmapToImageView(bitmap);
 
-                    applyBitmapToImageView(bitmap);
+                saveBitmapOnDisk(bitmap);
 
-                    saveBitmapOnDisk(bitmap);
+                saveBitmapOnMemory(bitmap);
 
-                    saveBitmapOnMemory(bitmap);
-
-
-                } catch (Exception e) {
-
-                    handleErrors(e);
-                }
             }
 
             @Override
@@ -379,7 +371,7 @@ public class Zimage {
             public void onFailed(Exception err) {
 
                 Log.e(TAG, "onFailed: DiskCached "+err.getMessage());
-
+                handleErrors(err);
             }
         });
     }
@@ -409,24 +401,16 @@ public class Zimage {
      * Draw bitmap fetched on ImageView
      * @param bitmap
      */
-    private void applyBitmapToImageView(@NonNull Bitmap bitmap) throws Exception{
+    private void applyBitmapToImageView(@NonNull Bitmap bitmap) {
 
-        try {
+        Log.i(TAG, "bitmap size: "+bitmap.getByteCount()/1024+" kB");
 
-            Log.i(TAG, "bitmap size: "+bitmap.getByteCount()/1024+" kB");
+        //todo: scale and crop bitmap to adaptive with imageView
+        mImageView.setImageBitmap(bitmap);
 
-            //todo: scale and crop bitmap to adaptive with imageView
-            mImageView.setImageBitmap(bitmap);
+        if(mListener!=null)
+            mListener.onSucceed(mImageView, mUrl);
 
-            if(mListener!=null)
-                mListener.onSucceed(mImageView, mUrl);
-
-        }
-        catch (Exception e){
-
-            throw e;
-
-        }
     }
 
 

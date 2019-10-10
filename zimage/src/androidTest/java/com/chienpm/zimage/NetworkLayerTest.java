@@ -95,11 +95,7 @@ public class NetworkLayerTest {
                     System.out.println("onSucceed from stream - data: "+bitmap.getByteCount() +" bytes");
                 }
 
-                @Override
-                public void onDownloadedImage(@NonNull final File targetFile) {
-                    Log.i(TAG, "onDownloadedImage: "+ targetFile.getAbsolutePath());
-                    System.out.println("onDownloadedImage: "+targetFile.getAbsolutePath());
-                }
+
             });
         } catch (Exception e) {
             e.printStackTrace();

@@ -5,6 +5,7 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
+import com.chienpm.zimage.controller.Validator;
 import com.chienpm.zimage.mapping.MappingManager;
 import com.chienpm.zimage.utils.MsgDef;
 
@@ -31,29 +32,31 @@ class DiskLoadBitmapTask implements Runnable{
 
             final Bitmap bitmap = DiskUtils.loadBitmapFromFile(file);
 
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-
-                    mCallback.onSucceed(bitmap, file);
-
-                }
-            });
-
+            if(Validator.checkBitmap(bitmap)) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCallback.onSucceed(bitmap, file);
+                    }
+                });
+            }
+            else{
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCallback.onFailed(new Exception("Cannot decode cached file. Storage permission might not granted!"));
+                    }
+                });
+            }
         }
         else{
-
             mHandler.post(new Runnable() {
 
                 @Override
                 public void run() {
-
                     mCallback.onFailed(new Exception(MsgDef.ERR_INVALID_FILE_CACHED));
-
                 }
             });
         }
-
-
     }
 }

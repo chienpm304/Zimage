@@ -1,6 +1,7 @@
 package com.chienpm.zimage.mapping;
 
 import android.os.Environment;
+import android.util.Log;
 
 import com.chienpm.zimage.disk_layer.DiskUtils;
 
@@ -10,6 +11,8 @@ import java.io.File;
  *  MappingManager is a helper class with mapping image URL to @DiskCacheManager path and @MemoryCacheManager
  */
 public class MappingManager {
+
+    public static final String TAG = MappingManager.class.getSimpleName();
 
     public static String getKeyFromUrl(String url) {
         return String.valueOf(url.hashCode());
@@ -29,7 +32,10 @@ public class MappingManager {
         if(!root.exists())
             root.mkdirs();
 
-        return new File(root, file_name);
+        File file = new File(root, file_name);
+
+        Log.i(TAG, "getTemporaryFileFromUrl: "+file.getAbsolutePath());
+        return file;
 
     }
 
@@ -43,7 +49,11 @@ public class MappingManager {
         if(!root.exists())
             root.mkdirs();
 
-        return new File(root, file_name);
+        File file = new File(root, file_name);
+
+        Log.i(TAG, "getFileFromURL: "+file.getAbsolutePath());
+
+        return file;
 
     }
 
