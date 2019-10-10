@@ -2,6 +2,7 @@ package com.chienpm.zimage.disk_layer;
 
 import android.graphics.Bitmap;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -12,6 +13,7 @@ import com.chienpm.zimage.utils.MsgDef;
 import java.io.File;
 
 class DiskLoadBitmapTask implements Runnable{
+    public static final String TAG = DiskLoadBitmapTask.class.getSimpleName();
     private final String mUrl;
     private final Handler mHandler;
     private final DiskCacheCallback mCallback;
@@ -41,10 +43,12 @@ class DiskLoadBitmapTask implements Runnable{
                 });
             }
             else{
+                // Unable to decode file because of permission denied (storage permission)
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mCallback.onFailed(new Exception("Cannot decode cached file. Storage permission might not granted!"));
+                        Log.e(TAG, "Unable to decode file because of permission denied (storage permission)");
+                        mCallback.onFailed(new Exception("Unable to decode file because of permission denied (storage permission)"));
                     }
                 });
             }

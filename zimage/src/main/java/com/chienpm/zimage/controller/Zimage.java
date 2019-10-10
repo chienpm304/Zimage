@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +34,7 @@ public class Zimage {
 
 
     public static final String TAG = Zimage.class.getSimpleName();
+    public static final String TAG_ERROR = "Zimage_ERROR";
     public static int VERSION = 1;
 
     /* Zimage's exclusively instance*/
@@ -192,7 +194,7 @@ public class Zimage {
 
         }
         catch (Exception e){
-
+            Log.e(TAG_ERROR, "Zimage summary error: ", e);
             handleErrors(e);
 
         }
@@ -251,15 +253,7 @@ public class Zimage {
 
             Log.i(TAG, "loadBitmapFromMemory: from MemoryCacheLayer");
 
-            try {
-
-                applyBitmapToImageView(bitmap);
-
-            } catch (Exception e) {
-
-                handleErrors(e);
-
-            }
+            applyBitmapToImageView(bitmap);
 
         }
         else {
@@ -283,36 +277,19 @@ public class Zimage {
 
                 Log.i(TAG, "Load done: from DiskCacheLayer");
 
-                try {
+                applyBitmapToImageView(bm);
 
-                    applyBitmapToImageView(bm);
-
-                    // Cached bitmap loaded on memory
-                    saveBitmapOnMemory(bm);
-
-                } catch (Exception e) {
-
-                    handleErrors(e);
-
-                }
-
-
-
+                // Cached bitmap loaded on memory
+                saveBitmapOnMemory(bm);
             }
 
             @Override
             public void onFailed(Exception err) {
-                try {
 
-                    fetchImageFromNetwork();
+                Log.e(TAG, "DiskCache load Bitmap onFailed: ", err);
 
-                } catch (Exception e) {
+                fetchImageFromNetwork();
 
-                    e.printStackTrace();
-
-                    handleErrors(e);
-
-                }
             }
         });
     }
@@ -343,6 +320,8 @@ public class Zimage {
             @Override
             public void onFailed(@NonNull Exception err) {
 
+                Log.e(TAG_ERROR, "NetworkLayer fetch image Failed: ", err);
+
                 handleErrors(err);
 
             }
@@ -370,8 +349,8 @@ public class Zimage {
             @Override
             public void onFailed(Exception err) {
 
-                Log.e(TAG, "onFailed: DiskCached "+err.getMessage());
-                handleErrors(err);
+                Log.e(TAG_ERROR, "DiskCache saveBitmapOnDisk Failed" + err.getMessage());
+
             }
         });
     }
