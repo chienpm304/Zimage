@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +11,7 @@ import androidx.annotation.Nullable;
 import com.chienpm.zimage.R;
 import com.chienpm.zimage.disk_layer.DiskCacheCallback;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
+import com.chienpm.zimage.exception.ZimageException;
 import com.chienpm.zimage.memory_layer.MemoryCacheManager;
 import com.chienpm.zimage.network_layer.DownloadCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
@@ -55,8 +55,8 @@ public class Zimage {
     private int mLoadingResId;
     private int mErrorResId;
     private ImageView mImageView;
-//    private int mWidth;
-//    private int mHeight;
+    private int mWidth;
+    private int mHeight;
     private ZimageCallback mListener;
 
 
@@ -131,13 +131,13 @@ public class Zimage {
 
     /***
      *
-     * @param width is new width to scale
-     * @param height is new height to scale
+     * @param width is new width of the bitmap to be cached on Disk
+     * @param height is new height of the bitmap to be cached on Disk
      * @return Zimage instance to continuous builder
      */
     public Zimage resize(int width, int height){
-//        this.mWidth = width;
-//        this.mHeight = height;
+        this.mWidth = width;
+        this.mHeight = height;
         return mInstance;
     }
 
@@ -193,7 +193,7 @@ public class Zimage {
 
 
         }
-        catch (Exception e){
+        catch (ZimageException e){
             Log.e(TAG_ERROR, "Zimage summary error: ", e);
             handleErrors(e);
 
@@ -205,13 +205,13 @@ public class Zimage {
      * Draw error bitmap on image
      * @param e is Exception instance which contain error message.
      */
-    private void handleErrors(Exception e) {
+    private void handleErrors(ZimageException e) {
 
         Log.i(TAG, "handleErrors: "+e.getMessage());
 
         if(mListener!=null) {
 
-            mListener.onError(mImageView, mUrl, e);
+            mListener.onFailed(mImageView, mUrl, e);
 
         }
 
@@ -226,13 +226,13 @@ public class Zimage {
      * We will check: Context, Url, ImageView instances
      * @throws Exception if any of it is Invalid
      */
-    private void validateParameters() throws Exception{
+    private void validateParameters() throws ZimageException {
         try{
             Validator.checkContext(mContext);
             Validator.checkUrl(mUrl);
             Validator.checkImageView(mImageView);
         }
-        catch (Exception e){
+        catch (ZimageException e){
             throw e;
         }
     }
@@ -284,7 +284,7 @@ public class Zimage {
             }
 
             @Override
-            public void onFailed(Exception err) {
+            public void onFailed(ZimageException err) {
 
                 Log.e(TAG, "DiskCache load Bitmap onFailed: ", err);
 
@@ -318,7 +318,7 @@ public class Zimage {
             }
 
             @Override
-            public void onFailed(@NonNull Exception err) {
+            public void onFailed(@NonNull ZimageException err) {
 
                 Log.e(TAG_ERROR, "NetworkLayer fetch image Failed: ", err);
 
@@ -330,6 +330,8 @@ public class Zimage {
     }
 
     private void saveBitmapOnMemory(Bitmap bitmap) {
+
+        //Resize bitmap before cached it on memory
 
         mMemoryCacheManager.saveBitmap(mUrl, bitmap);
 
@@ -347,7 +349,7 @@ public class Zimage {
             }
 
             @Override
-            public void onFailed(Exception err) {
+            public void onFailed(ZimageException err) {
 
                 Log.e(TAG_ERROR, "DiskCache saveBitmapOnDisk Failed" + err.getMessage());
 

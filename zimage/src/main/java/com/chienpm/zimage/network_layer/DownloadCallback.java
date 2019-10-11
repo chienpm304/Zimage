@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.NonNull;
 
+import com.chienpm.zimage.exception.ZimageException;
+
 /**
  *  @DownloadTaskCallback interface which is used to return results from DownloadTask into Mainthread (for which component implement this interface)
  *  Expected: on of 3 methods in this interface will be invoked
@@ -17,6 +19,6 @@ public interface DownloadCallback {
 //    void onDownloadedImage(@NonNull File outputFile);
 
     // Error
-    void onFailed(@NonNull Exception err);
+    void onFailed(@NonNull ZimageException err);
 
 }

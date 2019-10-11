@@ -1,0 +1,32 @@
+package com.chienpm.zimage.exception;
+
+/**
+ * @MsgDef is a string definitions wrapper
+ */
+public enum ErrorCode {
+
+//public enum ErrorCode{
+
+    ERR_INVALID_CONTEXT,
+
+    ERR_INVALID_IMAGE_VIEW,
+
+    ERR_INVALID_IMAGE_URL,
+
+    ERR_INVALID_BITMAP,
+
+    ERR_NO_INTERNET_CONNECTION,
+
+    ERR_PERMISSION_DENIED_FOR_WRITING_FILE,
+
+    CANNOT_CONNECT_TO_SERVER,
+
+    ERR_FILE_CACHED_NOT_FOUND_OR_INVALID,
+
+    ERR_WHEN_SAVE_BITMAP_ON_DISK,
+
+    ERR_WHEN_DOWNLOAD_IMAGE_FROM_NETWORK,
+
+    ERR_WHEN_WRITE_STREAM_TO_FILE, ERR_UNABLE_TO_DECODE_FILE_COZ_PERMISSION
+//}
+}

@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.chienpm.zimage.controller.Zimage;
 import com.chienpm.zimage.controller.ZimageCallback;
+import com.chienpm.zimage.exception.ZimageException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,9 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onError(@Nullable ImageView imageView, String url,  @NonNull final Exception e) {
+                public void onFailed(@Nullable ImageView imageView, String url, @NonNull final ZimageException e) {
 
-                    Toast.makeText(getApplicationContext(), "Error: "+e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Failed: "+e.getMessage(), Toast.LENGTH_LONG).show();
 
                 }
 

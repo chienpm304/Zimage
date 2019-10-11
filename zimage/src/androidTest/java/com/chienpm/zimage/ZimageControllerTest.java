@@ -1,6 +1,7 @@
 package com.chienpm.zimage;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -8,9 +9,14 @@ import androidx.annotation.Nullable;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.chienpm.zimage.controller.Zimage;
 import com.chienpm.zimage.controller.ZimageCallback;
-import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.exception.ErrorCode;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,7 +80,7 @@ public class ZimageControllerTest {
 
 
         assertNotNull(err);
-        assertEquals(MsgDef.ERR_INVALID_CONTEXT, err.getMessage());
+        assertEquals(ErrorCode.ERR_INVALID_CONTEXT, err.getMessage());
 
     }
 
@@ -117,7 +123,7 @@ public class ZimageControllerTest {
         }
 
         assertNotNull(err);
-        assertEquals(err.getMessage(), MsgDef.ERR_INVALID_IMAGE_VIEW);
+        assertEquals(err.getMessage(), ErrorCode.ERR_INVALID_IMAGE_VIEW);
 
     }
 
@@ -139,7 +145,7 @@ public class ZimageControllerTest {
         }
 
         assertNotNull(err);
-        assertEquals(err.getMessage(), MsgDef.ERR_INVALID_IMAGE_URL);
+        assertEquals(err.getMessage(), ErrorCode.ERR_INVALID_IMAGE_URL);
 
     }
 
@@ -184,7 +190,7 @@ public class ZimageControllerTest {
             }
 
             @Override
-            public void onError(@Nullable ImageView imageView, String url, @NonNull Exception e) {
+            public void onFailed(@Nullable ImageView imageView, String url, @NonNull Exception e) {
 
             }
 
@@ -211,19 +217,19 @@ public class ZimageControllerTest {
         Context ctx = getContext();
         ImageView imageView = new ImageView(ctx);
 
-//        Glide
-//                .with(ctx)
-//                .load("asf").addListener(new RequestListener<Drawable>() {
-//                    @Override
-//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-//                        return false;
-//                    }
-//                })
-//                .into(imageView);
+        Glide
+            .with(ctx)
+            .load("asf").addListener(new RequestListener<Drawable>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                    return false;
+                }
+            })
+            .into(imageView);
     }
 }

@@ -5,12 +5,14 @@ import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.chienpm.zimage.exception.ZimageException;
+
 import java.io.File;
 
 public interface DiskCacheCallback {
 
     void onSucceed(@Nullable Bitmap bitmap, @NonNull File ouput_file);
 
-    void onFailed(Exception err);
+    void onFailed(@NonNull ZimageException err);
 
 }

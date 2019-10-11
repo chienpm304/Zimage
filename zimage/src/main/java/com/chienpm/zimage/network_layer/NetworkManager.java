@@ -4,7 +4,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.exception.ErrorCode;
+import com.chienpm.zimage.exception.ZimageException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,7 +66,7 @@ public class NetworkManager {
 
             } else {
 
-                callback.onFailed(new Exception(MsgDef.ERR_NO_INTERNET_CONNECTION));
+                callback.onFailed(new ZimageException(ErrorCode.ERR_NO_INTERNET_CONNECTION));
 
             }
         }

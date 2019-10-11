@@ -78,7 +78,7 @@ public class DiskUtils {
             out.flush();
             out.close();
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             throw e;
         }
     }

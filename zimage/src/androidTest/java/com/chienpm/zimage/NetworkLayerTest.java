@@ -15,12 +15,10 @@ import com.chienpm.zimage.controller.ZimageCallback;
 import com.chienpm.zimage.network_layer.DownloadCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.network_layer.NetworkUtils;
-import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.exception.ErrorCode;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -60,8 +58,8 @@ public class NetworkLayerTest {
             }
 
             @Override
-            public void onError(@Nullable ImageView imageView, String url, @NonNull Exception e) {
-                assertEquals(MsgDef.ERR_NO_INTERNET_CONNECTION, e.getMessage());
+            public void onFailed(@Nullable ImageView imageView, String url, @NonNull Exception e) {
+                assertEquals(ErrorCode.ERR_NO_INTERNET_CONNECTION, e.getMessage());
             }
 
         };

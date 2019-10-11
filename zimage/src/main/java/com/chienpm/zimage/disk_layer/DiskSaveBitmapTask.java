@@ -5,6 +5,8 @@ import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
+import com.chienpm.zimage.exception.ErrorCode;
+import com.chienpm.zimage.exception.ZimageException;
 import com.chienpm.zimage.mapping.MappingManager;
 
 import java.io.File;
@@ -51,7 +53,13 @@ public class DiskSaveBitmapTask implements Runnable {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    mCallback.onFailed(e);
+                    ZimageException err = new ZimageException(
+                            ErrorCode.ERR_WHEN_SAVE_BITMAP_ON_DISK,
+                            e.getMessage(),
+                            e.getCause(),
+                            e.getStackTrace()
+                    );
+                    mCallback.onFailed(err);
                 }
             });
 

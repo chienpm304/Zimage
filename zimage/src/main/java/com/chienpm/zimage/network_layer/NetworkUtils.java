@@ -3,7 +3,8 @@ package com.chienpm.zimage.network_layer;
 import android.content.Context;
 import android.net.ConnectivityManager;
 
-import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.exception.ErrorCode;
+import com.chienpm.zimage.exception.ZimageException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,11 +33,13 @@ public class NetworkUtils {
 
 
         }catch (Exception e){
+
             if(e.getMessage().contains("Permission denied"))
 //            BitmapFactory.de
-                throw new Exception(MsgDef.ERR_PERMISSION_DENIED_WRITING_FILE);
+                throw new ZimageException(ErrorCode.ERR_PERMISSION_DENIED_FOR_WRITING_FILE);
             else
-                throw e;
+                throw new ZimageException(ErrorCode.ERR_WHEN_WRITE_STREAM_TO_FILE, e.getMessage(), e.getCause(), e.getStackTrace());
+
         }
     }
 }

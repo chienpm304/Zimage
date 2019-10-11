@@ -6,8 +6,9 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 
 import com.chienpm.zimage.controller.Validator;
+import com.chienpm.zimage.exception.ZimageException;
 import com.chienpm.zimage.mapping.MappingManager;
-import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.exception.ErrorCode;
 
 import java.io.File;
 
@@ -46,7 +47,7 @@ class DiskLoadBitmapTask implements Runnable{
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mCallback.onFailed(new Exception(MsgDef.ERR_UNABLE_TO_DECODE_FILE_COZ_PERMISSION));
+                        mCallback.onFailed(new ZimageException(ErrorCode.ERR_UNABLE_TO_DECODE_FILE_COZ_PERMISSION));
                     }
                 });
             }
@@ -56,7 +57,7 @@ class DiskLoadBitmapTask implements Runnable{
 
                 @Override
                 public void run() {
-                    mCallback.onFailed(new Exception(MsgDef.ERR_FILE_CACHED_NOT_FOUND_OR_INVALID));
+                    mCallback.onFailed(new ZimageException(ErrorCode.ERR_FILE_CACHED_NOT_FOUND_OR_INVALID));
                 }
             });
         }

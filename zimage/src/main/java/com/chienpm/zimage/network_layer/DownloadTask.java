@@ -8,8 +8,9 @@ import android.util.Log;
 
 import com.chienpm.zimage.controller.Validator;
 import com.chienpm.zimage.disk_layer.DiskUtils;
+import com.chienpm.zimage.exception.ZimageException;
 import com.chienpm.zimage.mapping.MappingManager;
-import com.chienpm.zimage.utils.MsgDef;
+import com.chienpm.zimage.exception.ErrorCode;
 
 import java.io.File;
 import java.io.InputStream;
@@ -36,7 +37,7 @@ class DownloadTask implements Runnable {
 //    private File mResultOutputFile = null;
 
     // Error
-    private Exception mResultErr = null;
+    private ZimageException mResultErr = null;
 
 
     /**
@@ -109,7 +110,6 @@ class DownloadTask implements Runnable {
                 if(Validator.checkBitmap(bitmap)) {
 
                     mResultBitmap = bitmap;
-//                    mResultOutputFile = null;
                     mResultErr = null;
 
                 } else {
@@ -122,27 +122,29 @@ class DownloadTask implements Runnable {
 
                     if(Validator.checkBitmap(bitmap)) {
                         mResultBitmap = bitmap;
-//                        mResultOutputFile = outputFile;
                         mResultErr = null;
                     }
                     else {
                         mResultBitmap = null;
-//                        mResultOutputFile = null;
-                        mResultErr = new Exception(MsgDef.ERR_INVALID_BITMAP);
+                        mResultErr = new ZimageException(ErrorCode.ERR_INVALID_BITMAP);
                     }
                 }
             }
             else{
 
-                mResultErr = new Exception(MsgDef.CANNOT_CONNECT_TO_SERVER+". Error code: "+responseCode);
+                mResultErr = new ZimageException(ErrorCode.CANNOT_CONNECT_TO_SERVER);
 
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+
             mResultBitmap = null;
-//            mResultOutputFile = null;
-            mResultErr = e;
+            mResultErr = new ZimageException(
+                    ErrorCode.ERR_WHEN_DOWNLOAD_IMAGE_FROM_NETWORK,
+                    e.getMessage(),
+                    e.getCause(),
+                    e.getStackTrace());
         }
         finally {
 
@@ -175,11 +177,6 @@ class DownloadTask implements Runnable {
                         mCallback.onSucceed(mResultBitmap);
 
                     }
-//                    else if(mResultOutputFile!=null){
-//
-//                        mCallback.onDownloadedImage(mResultOutputFile);
-//
-//                    }
                     else if(mResultErr != null){
 
                         mCallback.onFailed(mResultErr);
