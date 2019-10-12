@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import com.chienpm.zimage.exception.ZimageException;
 
 /**
- * Zimage listener is an optional while building
+ * ZimageEngine listener is an optional while building
  * Invoke to 2 methods: @onSucceed and @onFailed
  */
 public interface ZimageCallback {

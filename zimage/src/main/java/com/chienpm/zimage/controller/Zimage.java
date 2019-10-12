@@ -20,10 +20,10 @@ import com.chienpm.zimage.utils.ImageUtils;
 import java.io.File;
 
 /**
- * Zimage is the master class to apply url image into a ImageView
+ * ZimageEngine is the master class to apply url image into a ImageView
  * Which is singleton and builder pattern:
  * @Usage:
- *          Zimage.getInstance()
+ *          ZimageEngine.getInstance()
  *              .with(Context)
  *              .from(String url)
  *              .reisze(witdth, height)
@@ -33,11 +33,11 @@ import java.io.File;
 public class Zimage {
 
 
-    public static final String TAG = Zimage.class.getSimpleName();
-    public static final String TAG_ERROR = "Zimage_ERROR";
+    private static final String TAG = ZimageEngine.class.getSimpleName();
+    private static final String TAG_ERROR = "Zimage_ERROR";
     public static int VERSION = 1;
 
-    /* Zimage's exclusively instance*/
+    /* ZimageEngine's exclusively instance*/
     private static Zimage mInstance = null;
 
     private static NetworkManager mNetworkManager = null;
@@ -46,22 +46,23 @@ public class Zimage {
 
     private static MemoryCacheManager mMemoryCacheManager = null;
 
-    private static Object mSync = new Object();
+    private static final Object mSync = new Object();
 
 
     // Inputs request fields
-    private Context mContext;
-    private String mUrl;
-    private int mLoadingResId;
-    private int mErrorResId;
-    private ImageView mImageView;
-    private int mWidth;
-    private int mHeight;
-    private ZimageCallback mListener;
+//    private Context mContext;
+//    private String mUrl;
+//    private int mLoadingResId;
+//    private int mErrorResId;
+//    private ImageView mImageView;
+//    private int mWidth;
+//    private int mHeight;
+//    private ZimageCallback mListener;
 
+    private ZimageRequest mRequest = new ZimageRequest();
 
     /**
-     * Hidden Zimage constructor to deny user creating Zimage instances, use only one.
+     * Hidden ZimageEngine constructor to deny user creating ZimageEngine instances, use only one.
      */
     private Zimage() {
         initManagers();
@@ -88,12 +89,13 @@ public class Zimage {
 
     public void reset() {
         mInstance = null;
-        mContext = null;
-        mUrl = "";
-        mImageView = null;
-        mListener = null;
-        mLoadingResId = R.drawable.default_loading_drawable;
-        mErrorResId = R.drawable.default_error_drawable;
+        mRequest.reset();
+//        mContext = null;
+//        mUrl = "";
+//        mImageView = null;
+//        mListener = null;
+//        mLoadingResId = R.drawable.default_loading_drawable;
+//        mErrorResId = R.drawable.default_error_drawable;
 //        mWidth = 0;
 //        mHeight = 0;
     }
@@ -101,20 +103,20 @@ public class Zimage {
     /**
      *
      * @param context of Activity
-     * @return Zimage instance to continuous builder
+     * @return ZimageEngine instance to continuous builder
      */
     public Zimage with(Context context){
-        this.mContext = context;
+        mRequest.mContext = context;
         return this;
     }
 
     /***
      *
      * @param url: Image string url need to display
-     * @return Zimage instance to continuous builder
+     * @return ZimageEngine instance to continuous builder
      */
     public Zimage from(@NonNull String url) {
-        this.mUrl = url;
+        mRequest.mUrl = url;
         return mInstance;
     }
 
@@ -124,16 +126,15 @@ public class Zimage {
      * @return
      */
     public Zimage addListener(@NonNull ZimageCallback listener){
-        this.mListener = listener;
+        mRequest.mListener = listener;
         return mInstance;
     }
 
 
-    /***
-     *
+    /**
      * @param width is new width of the bitmap to be cached on Disk
      * @param height is new height of the bitmap to be cached on Disk
-     * @return Zimage instance to continuous builder
+     * @return ZimageEngine instance to continuous builder
      */
 //    public Zimage resize(int width, int height){
 //        this.mWidth = width;
@@ -144,13 +145,13 @@ public class Zimage {
     /***
      *
      * @param resId is the Resource which will be render on ImageView while loading
-     * @return Zimage instance to continuous builder
+     * @return ZimageEngine instance to continuous builder
      */
     public Zimage loadingResourceId(@NonNull int resId){
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_loading_drawable;
 
-        this.mLoadingResId = resId;
+        mRequest.mLoadingResId = resId;
 
         return mInstance;
     }
@@ -159,14 +160,14 @@ public class Zimage {
     /***
      *
      * @param resId is the Resource which will be render on ImageView when loading failed
-     * @return Zimage instance to continuous builder
+     * @return ZimageEngine instance to continuous builder
      */
     public Zimage errorResId(@NonNull int resId){
 
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_error_drawable;
 
-        this.mErrorResId = resId;
+        mRequest.mErrorResId = resId;
 
         return mInstance;
     }
@@ -181,237 +182,60 @@ public class Zimage {
      */
     public void into(@NonNull ImageView imageView){
 
-        this.mImageView = imageView;
+        mRequest.mImageView = imageView;
 
-        try {
-            // Apply loading image while fetch image
-            applyLoadingImage();
+        new ZimageEngine(mRequest).execute();
 
-            validateParameters();
-
-            loadBitmapFromMemory();
-
-
-        }
-        catch (ZimageException e){
-            Log.e(TAG_ERROR, "Zimage summary error: ", e);
-            handleErrors(e);
-
-        }
     }
 
-    /**
-     * Handle Errors which occur when processing
-     * Draw error bitmap on image
-     * @param e is Exception instance which contain error message.
-     */
-    private void handleErrors(ZimageException e) {
 
-        Log.i(TAG, "handleErrors: "+e.getMessage());
+    class ZimageRequest {
 
-        if(mListener!=null) {
+        Context mContext;
+        String mUrl;
+        ImageView mImageView;
+        ZimageCallback mListener;
+        int mWidth;
+        int mHeight;
+        int mLoadingResId;
+        int mErrorResId;
 
-            mListener.onFailed(mImageView, mUrl, e);
-
+        ZimageRequest() {
+            reset();
         }
 
-        // Apply error image when error occurs
-        applyErrorImage();
-
-    }
-
-
-    /***
-     * Validate parameters passed before running library
-     * We will check: Context, Url, ImageView instances
-     * @throws Exception if any of it is Invalid
-     */
-    private void validateParameters() throws ZimageException {
-        try{
-
-            Validator.checkContext(mContext);
-            Validator.checkUrl(mUrl);
-            Validator.checkImageView(mImageView);
-
-            mWidth = mImageView.getMeasuredWidth();
-            mHeight = mImageView.getMeasuredHeight();
-
-            Log.i(TAG, "ImageView: "+mWidth+"x"+mHeight);
-
-        }
-        catch (ZimageException e){
-            throw e;
-        }
-    }
-
-
-
-    /***
-     *  Try to load bitmap from memory using url key
-     */
-    public void loadBitmapFromMemory() {
-
-        Bitmap bitmap;
-
-        //Try to load image from memory cache
-        bitmap = mMemoryCacheManager.loadBitmap(mUrl, mWidth, mHeight);
-
-        if(Validator.checkBitmap(bitmap)) {
-
-            Log.i(TAG, "loadBitmapFromMemory: from MemoryCacheLayer");
-
-            applyBitmapToImageView(bitmap);
-
-        }
-        else {
-
-            loadBitmapFromDisk();
-
+        void reset() {
+            mContext = null;
+            mUrl = "";
+            mImageView = null;
+            mListener = null;
+            mLoadingResId = R.drawable.default_loading_drawable;
+            mErrorResId = R.drawable.default_error_drawable;
+            mWidth = 0;
+            mHeight = 0;
         }
 
+        @Override
+        public String toString() {
+            return "ZimageRequest{" +
+                    "mContext=" + mContext +
+                    ", mUrl='" + mUrl + '\'' +
+                    ", mImageView=" + mImageView +
+                    ", mListener=" + mListener +
+                    '}';
+        }
+
+        public ZimageRequest copy() {
+            ZimageRequest req = new ZimageRequest();
+            req.mContext = mContext;
+            req.mUrl = mUrl;
+            req.mImageView = mImageView;
+            req.mListener = mListener;
+            req.mWidth = mWidth;
+            req.mHeight = mHeight;
+            req.mErrorResId = mErrorResId;
+            req.mLoadingResId = mLoadingResId;
+            return req;
+        }
     }
-
-    /**
-     * Try to load bitmap from local disk storage using url key
-     */
-    private void loadBitmapFromDisk() {
-
-        // Try to load image from disk
-        mDiskCacheManager.loadBitmap(mUrl, new DiskCacheCallback() {
-
-            @Override
-            public void onSucceed(@Nullable Bitmap originBitmap, @NonNull File ouputFile) {
-
-                Log.i(TAG, "Load done: from DiskCacheLayer");
-
-                Log.i(TAG, "Bitmap loaded from disk: " + originBitmap.getWidth() +"x"+originBitmap.getHeight() + " size: "+originBitmap.getByteCount()/1024+" kb");
-
-                Bitmap scaledBitmap = ImageUtils.resizeBitmap(originBitmap, mWidth, mHeight);
-
-                //render scaled bitmap on ImageView
-                applyBitmapToImageView(scaledBitmap);
-
-                // Cached bitmap loaded on memory
-                saveBitmapOnMemory(scaledBitmap);
-
-            }
-
-            @Override
-            public void onFailed(ZimageException err) {
-
-                Log.e(TAG, "DiskCache load Bitmap onFailed: ", err);
-
-                fetchImageFromNetwork();
-
-            }
-        });
-    }
-
-
-    /**
-     * Try to fetch image from network using DownloadTask to decoded image to bitmap
-     * The bitmap result is call in DownloadTask
-     */
-    private void fetchImageFromNetwork() {
-
-        // Fetch image from network (result in bitmap or image file)
-        mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadCallback() {
-
-            @Override
-            public void onSucceed(@NonNull Bitmap originBitmap) {
-
-                Log.i(TAG, "Load done: from NetworkLayer");
-                Log.i(TAG, "Bitmap fetched from network: " + originBitmap.getWidth() +"x"+originBitmap.getHeight() + " size: "+originBitmap.getByteCount()/1024+" kb");
-
-                Bitmap scaledBitmap = ImageUtils.resizeBitmap(originBitmap, mWidth, mHeight);
-
-                // render scaled bitmap on ImageView
-                applyBitmapToImageView(scaledBitmap);
-
-                // save original bitmap on Disk
-                saveBitmapOnDisk(originBitmap);
-
-                // save scaled bitmap in Memory
-                saveBitmapOnMemory(scaledBitmap);
-
-            }
-
-            @Override
-            public void onFailed(@NonNull ZimageException err) {
-
-                Log.e(TAG_ERROR, "NetworkLayer fetch image Failed: ", err);
-
-                handleErrors(err);
-
-            }
-
-        });
-    }
-
-    private void saveBitmapOnMemory(Bitmap bitmap) {
-
-        //Resize bitmap before cached it on memory
-
-        mMemoryCacheManager.saveBitmap(mUrl, bitmap, mWidth, mHeight);
-
-    }
-
-    private void saveBitmapOnDisk(Bitmap bitmap) {
-
-        mDiskCacheManager.saveBitmap(mUrl, bitmap, new DiskCacheCallback() {
-
-            @Override
-            public void onSucceed(@NonNull Bitmap bitmap, @NonNull File file) {
-
-                Log.i(TAG, "onSucceed: DiskCached "+file.getAbsolutePath());
-
-            }
-
-            @Override
-            public void onFailed(ZimageException err) {
-
-                Log.e(TAG_ERROR, "DiskCache saveBitmapOnDisk Failed" + err.getMessage());
-
-            }
-        });
-    }
-
-
-    /**
-     * Draw loading image on ImageView while Zimage processing
-     */
-    private void applyLoadingImage() {
-
-        ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mLoadingResId);
-
-    }
-
-
-    /**
-     * Draw loading image on ImageView when Zimage process failed
-     */
-    private void applyErrorImage() {
-
-        ImageUtils.inflateDrawableOverImageView(mContext, mImageView, mErrorResId);
-
-    }
-
-
-    /**
-     * Draw bitmap fetched on ImageView
-     * @param bitmap
-     */
-    private void applyBitmapToImageView(@NonNull Bitmap bitmap) {
-
-        Log.i(TAG, "bitmap rendered: " + bitmap.getWidth() +"x"+bitmap.getHeight() + " size: "+bitmap.getByteCount()/1024+"kb");
-
-        //todo: scale and crop bitmap to adaptive with imageView
-        mImageView.setImageBitmap(bitmap);
-
-        if(mListener!=null)
-            mListener.onSucceed(mImageView, mUrl);
-
-    }
-
-
 }

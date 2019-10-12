@@ -3,6 +3,7 @@ package com.chienpm.zimage.network_layer;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.chienpm.zimage.exception.ErrorCode;
 import com.chienpm.zimage.exception.ZimageException;
@@ -12,6 +13,7 @@ import java.util.concurrent.Executors;
 
 public class NetworkManager {
 
+    public static final String TAG = NetworkManager.class.getSimpleName();
     private static NetworkManager mInstance = null;
 
     private static ExecutorService mExecutor = null;
@@ -59,7 +61,7 @@ public class NetworkManager {
         if(callback!=null) {
 
             if (NetworkUtils.isNetworkConnected(context)) {
-
+//                Log.i(TAG, "downloadFileFromURL: "+url);
                 DownloadTask task = new DownloadTask(url, mHandler, callback);
 
                 mExecutor.execute(task);

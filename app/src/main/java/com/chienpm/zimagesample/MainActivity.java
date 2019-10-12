@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.chienpm.zimage.controller.Zimage;
+import com.chienpm.zimage.controller.ZimageEngine;
 import com.chienpm.zimage.controller.ZimageCallback;
 import com.chienpm.zimage.exception.ZimageException;
 

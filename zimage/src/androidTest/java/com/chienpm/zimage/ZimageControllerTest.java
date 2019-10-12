@@ -14,9 +14,10 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.chienpm.zimage.controller.Zimage;
+import com.chienpm.zimage.controller.ZimageEngine;
 import com.chienpm.zimage.controller.ZimageCallback;
 import com.chienpm.zimage.exception.ErrorCode;
+import com.chienpm.zimage.exception.ZimageException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,25 +54,25 @@ public class ZimageControllerTest {
 
     @Test
     public void testZimageSingletonInstance(){
-        Zimage.getInstance().reset();
-        assertSame(Zimage.getInstance(), Zimage.getInstance());
-        assertSame(Zimage.getInstance(), Zimage.getInstance());
-        assertSame(Zimage.getInstance(), Zimage.getInstance());
-        assertSame(Zimage.getInstance(), Zimage.getInstance());
-        assertSame(Zimage.getInstance(), Zimage.getInstance());
+        ZimageEngine.getInstance().reset();
+        assertSame(ZimageEngine.getInstance(), ZimageEngine.getInstance());
+        assertSame(ZimageEngine.getInstance(), ZimageEngine.getInstance());
+        assertSame(ZimageEngine.getInstance(), ZimageEngine.getInstance());
+        assertSame(ZimageEngine.getInstance(), ZimageEngine.getInstance());
+        assertSame(ZimageEngine.getInstance(), ZimageEngine.getInstance());
     }
 
 
     @Test
     public void testZimageBuilderContextNull(){
-        Zimage.getInstance().reset();
+        ZimageEngine.getInstance().reset();
 
         Exception err = null;
         Context context = getContext();
         ImageView imgView = new ImageView(context);
 
         try {
-            Zimage.getInstance()
+            ZimageEngine.getInstance()
                     .from("https://1234124")
                     .into(imgView);
         } catch (Exception e) {
@@ -86,14 +87,14 @@ public class ZimageControllerTest {
 
     @Test
     public void testZimageBuilderContextTrue(){
-        Zimage.getInstance().reset();
+        ZimageEngine.getInstance().reset();
 
         Context context = getContext();
         ImageView imgView = new ImageView(context);
 
         Exception err = null;
         try {
-            Zimage.getInstance()
+            ZimageEngine.getInstance()
                     .with(context)
                     .from("https://1234124.com")
                     .into(imgView);
@@ -107,14 +108,14 @@ public class ZimageControllerTest {
 
     @Test
     public void testZimageBuilderWrongImageView(){
-        Zimage.getInstance().reset();
+        ZimageEngine.getInstance().reset();
 
         Exception err = null;
         Context context = getContext();
         ImageView imgView = null;
 
         try {
-            Zimage.getInstance()
+            ZimageEngine.getInstance()
                     .with(context)
                     .from("https://abc.com/asf.jpg")
                     .into(imgView);
@@ -129,14 +130,14 @@ public class ZimageControllerTest {
 
     @Test
     public void testZimageBuilderWrongURLpattern(){
-        Zimage.getInstance().reset();
+        ZimageEngine.getInstance().reset();
 
         Exception err = null;
         Context context = getContext();
         ImageView imgView = new ImageView(context);
 
         try {
-            Zimage.getInstance()
+            ZimageEngine.getInstance()
                     .with(context)
                     .from("https://abccom")
                     .into(imgView);
@@ -152,14 +153,14 @@ public class ZimageControllerTest {
 
     @Test
     public void testLoadNullBitmap(){
-        Zimage.getInstance().reset();
+        ZimageEngine.getInstance().reset();
 
         Context context = getContext();
         ImageView imgView = new ImageView(context);
         Exception err = null;
 
         try{
-            Zimage.getInstance()
+            ZimageEngine.getInstance()
                     .with(context)
                     .from("http://fb.com/chienpm.jpg")
 //                    .resize(100, 150)
@@ -175,7 +176,7 @@ public class ZimageControllerTest {
 
     @Test
     public void testPerfectFlow(){
-        Zimage.getInstance().reset();
+        ZimageEngine.getInstance().reset();
 
         Context context = getContext();
         ImageView imgView = new ImageView(context);
@@ -190,7 +191,7 @@ public class ZimageControllerTest {
             }
 
             @Override
-            public void onFailed(@Nullable ImageView imageView, String url, @NonNull Exception e) {
+            public void onFailed(@Nullable ImageView imageView, String url, @NonNull ZimageException e) {
 
             }
 
@@ -198,10 +199,10 @@ public class ZimageControllerTest {
 
 
         try{
-            Zimage.getInstance()
+            ZimageEngine.getInstance()
                     .with(context)
                     .from("http://fb.com/chienpm.jpg")
-                    .resize(100, 150)
+//                    .resize(100, 150)
                     .addListener(callback)
                     .into(imgView);
         }

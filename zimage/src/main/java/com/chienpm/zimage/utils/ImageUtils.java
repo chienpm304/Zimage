@@ -22,8 +22,8 @@ public class ImageUtils {
 
 
 
-        int width = imageView.getLayoutParams().width;
-        int height = imageView.getLayoutParams().height;
+        int width = imageView.getMeasuredWidth();
+        int height = imageView.getMeasuredHeight();
 
 
         Bitmap newImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);

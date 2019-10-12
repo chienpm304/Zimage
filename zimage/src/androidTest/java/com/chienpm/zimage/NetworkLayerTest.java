@@ -10,8 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
-import com.chienpm.zimage.controller.Zimage;
+import com.chienpm.zimage.controller.ZimageEngine;
 import com.chienpm.zimage.controller.ZimageCallback;
+import com.chienpm.zimage.exception.ZimageException;
 import com.chienpm.zimage.network_layer.DownloadCallback;
 import com.chienpm.zimage.network_layer.NetworkManager;
 import com.chienpm.zimage.network_layer.NetworkUtils;
@@ -58,13 +59,13 @@ public class NetworkLayerTest {
             }
 
             @Override
-            public void onFailed(@Nullable ImageView imageView, String url, @NonNull Exception e) {
+            public void onFailed(@Nullable ImageView imageView, String url, @NonNull ZimageException e) {
                 assertEquals(ErrorCode.ERR_NO_INTERNET_CONNECTION, e.getMessage());
             }
 
         };
 
-        Zimage.getInstance().with(mContext).from(mUrl).addListener(callback).into(mImageView);
+        ZimageEngine.getInstance().with(mContext).from(mUrl).addListener(callback).into(mImageView);
 //        assertTrue(true);
     }
 
@@ -82,7 +83,7 @@ public class NetworkLayerTest {
             NetworkManager.getInstance().
                     downloadFileFromURL(mContext, url3, new DownloadCallback() {
                 @Override
-                public void onFailed(@NonNull final Exception err) {
+                public void onFailed(@NonNull final ZimageException err) {
                     Log.e(TAG, "onFailed: ",err);
                     System.out.println("onFailed: "+err.getMessage());
                 }
