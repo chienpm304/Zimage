@@ -58,19 +58,20 @@ public class MemoryCacheManager {
 
 
 
-    public Bitmap loadBitmap(@NonNull String url) {
+    public Bitmap loadBitmap(@NonNull String url, int width, int height) {
 
-        String key = MappingManager.getKeyFromUrl(url);
+        String key = MappingManager.getKeyFromUrl(url, width, height);
 
         return mBitmapCache.get(key);
 
     }
 
-    public void saveBitmap(String url, Bitmap bitmap) {
+    public void saveBitmap(String url, Bitmap bitmap, int width, int height) {
 
-        if(loadBitmap(url)==null){
+        if(loadBitmap(url, width, height) == null){
 
-            String key = MappingManager.getKeyFromUrl(url);
+            String key = MappingManager.getKeyFromUrl(url, width, height);
+
             mBitmapCache.put(key, bitmap);
 
         }

@@ -135,11 +135,11 @@ public class Zimage {
      * @param height is new height of the bitmap to be cached on Disk
      * @return Zimage instance to continuous builder
      */
-    public Zimage resize(int width, int height){
-        this.mWidth = width;
-        this.mHeight = height;
-        return mInstance;
-    }
+//    public Zimage resize(int width, int height){
+//        this.mWidth = width;
+//        this.mHeight = height;
+//        return mInstance;
+//    }
 
     /***
      *
@@ -228,9 +228,16 @@ public class Zimage {
      */
     private void validateParameters() throws ZimageException {
         try{
+
             Validator.checkContext(mContext);
             Validator.checkUrl(mUrl);
             Validator.checkImageView(mImageView);
+
+            mWidth = mImageView.getMeasuredWidth();
+            mHeight = mImageView.getMeasuredHeight();
+
+            Log.i(TAG, "ImageView: "+mWidth+"x"+mHeight);
+
         }
         catch (ZimageException e){
             throw e;
@@ -247,7 +254,7 @@ public class Zimage {
         Bitmap bitmap;
 
         //Try to load image from memory cache
-        bitmap = mMemoryCacheManager.loadBitmap(mUrl);
+        bitmap = mMemoryCacheManager.loadBitmap(mUrl, mWidth, mHeight);
 
         if(Validator.checkBitmap(bitmap)) {
 
@@ -273,14 +280,20 @@ public class Zimage {
         mDiskCacheManager.loadBitmap(mUrl, new DiskCacheCallback() {
 
             @Override
-            public void onSucceed(@Nullable Bitmap bm, @NonNull File ouputFile) {
+            public void onSucceed(@Nullable Bitmap originBitmap, @NonNull File ouputFile) {
 
                 Log.i(TAG, "Load done: from DiskCacheLayer");
 
-                applyBitmapToImageView(bm);
+                Log.i(TAG, "Bitmap loaded from disk: " + originBitmap.getWidth() +"x"+originBitmap.getHeight() + " size: "+originBitmap.getByteCount()/1024+" kb");
+
+                Bitmap scaledBitmap = ImageUtils.resizeBitmap(originBitmap, mWidth, mHeight);
+
+                //render scaled bitmap on ImageView
+                applyBitmapToImageView(scaledBitmap);
 
                 // Cached bitmap loaded on memory
-                saveBitmapOnMemory(bm);
+                saveBitmapOnMemory(scaledBitmap);
+
             }
 
             @Override
@@ -305,15 +318,21 @@ public class Zimage {
         mNetworkManager.downloadFileFromURL(mContext, mUrl, new DownloadCallback() {
 
             @Override
-            public void onSucceed(@NonNull Bitmap bitmap) {
+            public void onSucceed(@NonNull Bitmap originBitmap) {
 
                 Log.i(TAG, "Load done: from NetworkLayer");
+                Log.i(TAG, "Bitmap fetched from network: " + originBitmap.getWidth() +"x"+originBitmap.getHeight() + " size: "+originBitmap.getByteCount()/1024+" kb");
 
-                applyBitmapToImageView(bitmap);
+                Bitmap scaledBitmap = ImageUtils.resizeBitmap(originBitmap, mWidth, mHeight);
 
-                saveBitmapOnDisk(bitmap);
+                // render scaled bitmap on ImageView
+                applyBitmapToImageView(scaledBitmap);
 
-                saveBitmapOnMemory(bitmap);
+                // save original bitmap on Disk
+                saveBitmapOnDisk(originBitmap);
+
+                // save scaled bitmap in Memory
+                saveBitmapOnMemory(scaledBitmap);
 
             }
 
@@ -333,7 +352,7 @@ public class Zimage {
 
         //Resize bitmap before cached it on memory
 
-        mMemoryCacheManager.saveBitmap(mUrl, bitmap);
+        mMemoryCacheManager.saveBitmap(mUrl, bitmap, mWidth, mHeight);
 
     }
 
@@ -384,7 +403,7 @@ public class Zimage {
      */
     private void applyBitmapToImageView(@NonNull Bitmap bitmap) {
 
-        Log.i(TAG, "bitmap size: "+bitmap.getByteCount()/1024+" kB");
+        Log.i(TAG, "bitmap rendered: " + bitmap.getWidth() +"x"+bitmap.getHeight() + " size: "+bitmap.getByteCount()/1024+"kb");
 
         //todo: scale and crop bitmap to adaptive with imageView
         mImageView.setImageBitmap(bitmap);

@@ -15,9 +15,12 @@ public class MappingManager {
     public static final String TAG = MappingManager.class.getSimpleName();
 
     public static String getKeyFromUrl(String url) {
-        return String.valueOf(url.hashCode());
+        return String.valueOf(Math.abs(url.hashCode()));
     }
 
+    public static String getKeyFromUrl(String url, int width, int height) {
+        return String.valueOf(Math.abs(new String(url+width+height).hashCode()));
+    }
     /**
      *
      * @param url
@@ -25,7 +28,7 @@ public class MappingManager {
      */
     public static File getTemporaryFileFromUrl(String url, String extension) {
 
-        String file_name = String.valueOf(url.hashCode()) + extension;
+        String file_name = String.valueOf(Math.abs(url.hashCode())) + extension;
 
         File root = new File(getBaseDir(), "tmp");
 
@@ -42,7 +45,7 @@ public class MappingManager {
 
     public static File getFileFromURL(String url) {
 
-        String file_name = String.valueOf(url.hashCode()) + ".jpg";
+        String file_name = String.valueOf(Math.abs(url.hashCode())) + ".jpg";
 
         File root = new File(getBaseDir(), "cache"+File.separator+"images");
 
@@ -83,4 +86,5 @@ public class MappingManager {
 
         return root;
     }
+
 }
