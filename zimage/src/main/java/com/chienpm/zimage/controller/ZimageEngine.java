@@ -1,14 +1,11 @@
 package com.chienpm.zimage.controller;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.chienpm.zimage.R;
 import com.chienpm.zimage.controller.Zimage.ZimageRequest;
 import com.chienpm.zimage.disk_layer.DiskCacheCallback;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
@@ -81,9 +78,14 @@ public class ZimageEngine {
 //    }
 
     private void initParameters() {
-        mRequest.mWidth = mRequest.mImageView.getMeasuredWidth();
-        mRequest.mHeight = mRequest.mImageView.getMeasuredHeight();
+////        mRequest.mWidth = mRequest.mImageView.getMeasuredWidth();
+////        mRequest.mHeight = mRequest.mImageView.getMeasuredHeight();
+//
+//        mRequest.mWidth = mRequest.mImageView.getLayoutParams().width;
+//        mRequest.mHeight = mRequest.mImageView.getLayoutParams().height;
 
+        mRequest.updateMeasuredSize();
+        Log.i(TAG, "initParameters: "+mRequest.mWidth+"x"+mRequest.mHeight);
 //        mContext.createConfigurationContext(new Configuration())
 
 //        Log.i(TAG, "ImageView: "+mWidth+"x"+mHeight);
@@ -142,7 +144,7 @@ public class ZimageEngine {
 
         if(Validator.checkBitmap(bitmap)) {
 
-            Log.i(TAG, "loadBitmapFromMemory: from MemoryCacheLayer");
+            Log.i(TAG, "Load done: from MemoryCacheLayer");
 
             applyBitmapToImageView(bitmap);
 
@@ -167,10 +169,12 @@ public class ZimageEngine {
             public void onSucceed(@Nullable Bitmap originBitmap, @NonNull File ouputFile) {
 
                 Log.i(TAG, "Load done: from DiskCacheLayer");
-
+                Log.i(TAG, "Request size: "+mRequest.mWidth+"x"+mRequest.mHeight);
                 Log.i(TAG, "Bitmap loaded from disk: " + originBitmap.getWidth() +"x"+originBitmap.getHeight() + " size: "+originBitmap.getByteCount()/1024+" kb");
 
                 Bitmap scaledBitmap = ImageUtils.resizeBitmap(originBitmap, mRequest.mWidth, mRequest.mHeight);
+
+                Log.i(TAG, "Bitmap scaled: " + scaledBitmap.getWidth() +"x"+scaledBitmap.getHeight() + " size: "+scaledBitmap.getByteCount()/1024+" kb");
 
                 //render scaled bitmap on ImageView
                 applyBitmapToImageView(scaledBitmap);
@@ -206,9 +210,12 @@ public class ZimageEngine {
             public void onSucceed(@NonNull Bitmap originBitmap) {
 
                 Log.i(TAG, "Load done: from NetworkLayer");
+                Log.i(TAG, "Request size: "+mRequest.mWidth+"x"+mRequest.mHeight);
                 Log.i(TAG, "Bitmap fetched from network: " + originBitmap.getWidth() +"x"+originBitmap.getHeight() + " size: "+originBitmap.getByteCount()+"  bytes");
 
                 Bitmap scaledBitmap = ImageUtils.resizeBitmap(originBitmap, mRequest.mWidth, mRequest.mHeight);
+
+                Log.i(TAG, "Bitmap scaled: " + scaledBitmap.getWidth() +"x"+scaledBitmap.getHeight() + " size: "+scaledBitmap.getByteCount()/1024+" kb");
 
                 // render scaled bitmap on ImageView
                 applyBitmapToImageView(scaledBitmap);
