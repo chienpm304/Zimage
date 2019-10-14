@@ -132,7 +132,7 @@ class DownloadTask implements Runnable {
             }
             else{
 
-                mResultErr = new ZimageException(ErrorCode.CANNOT_CONNECT_TO_SERVER);
+                mResultErr = new ZimageException(ErrorCode.ERR_CANNOT_CONNECT_TO_SERVER);
 
             }
 

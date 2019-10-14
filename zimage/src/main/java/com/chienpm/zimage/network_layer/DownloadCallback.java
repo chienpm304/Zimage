@@ -15,9 +15,6 @@ public interface DownloadCallback {
     // Return the bitmap which decoded from URL's stream
     void onSucceed(@NonNull Bitmap bitmap);
 
-    // The File where image was downloaded from url
-//    void onDownloadedImage(@NonNull File outputFile);
-
     // Error
     void onFailed(@NonNull ZimageException err);
 

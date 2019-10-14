@@ -47,7 +47,7 @@ class DiskLoadBitmapTask implements Runnable{
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        mCallback.onFailed(new ZimageException(ErrorCode.ERR_UNABLE_TO_DECODE_FILE_COZ_PERMISSION));
+                        mCallback.onFailed(new ZimageException(ErrorCode.ERR_WHEN_LOAD_BITMAP_FROM_DISK_ASK_STORAGE_PERMISSION));
                     }
                 });
             }
