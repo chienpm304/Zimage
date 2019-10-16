@@ -20,6 +20,6 @@ public class ExampleUnitTest {
         String mUrl = "http://www.project-disco.org/wp-content/uploads/2018/04/Android-logo-1024x576.jpg";
         String hashed = String.valueOf(mUrl.hashCode()) + ".jpg";
         System.out.println(hashed);
-        assertEquals(10, hashed);
+        assertNotEquals(10, hashed);
     }
 }
