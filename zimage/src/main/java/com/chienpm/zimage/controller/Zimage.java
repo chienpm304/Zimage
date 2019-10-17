@@ -139,7 +139,7 @@ public class Zimage {
      * @param resId is the Resource which will be render on ImageView while loading
      * @return ZimageEngine instance to continuous builder
      */
-    public Zimage loadingResourceId(@NonNull int resId){
+    public Zimage setLoadingResource(@NonNull int resId){
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_loading_drawable;
 
@@ -154,7 +154,7 @@ public class Zimage {
      * @param resId is the Resource which will be render on ImageView when loading failed
      * @return ZimageEngine instance to continuous builder
      */
-    public Zimage errorResId(@NonNull int resId){
+    public Zimage setErrorResource(@NonNull int resId){
 
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_error_drawable;
@@ -180,74 +180,4 @@ public class Zimage {
 
     }
 
-
-    class ZimageRequest {
-
-        Context mContext;
-        String mUrl;
-        ImageView mImageView;
-        ZimageCallback mListener;
-        int mWidth;
-        int mHeight;
-        int mLoadingResId;
-        int mErrorResId;
-
-        ZimageRequest() {
-            reset();
-        }
-
-        void reset() {
-            mContext = null;
-            mUrl = "";
-            mImageView = null;
-            mListener = null;
-            mLoadingResId = R.drawable.default_loading_drawable;
-            mErrorResId = R.drawable.default_error_drawable;
-            mWidth = 0;
-            mHeight = 0;
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            return "ZimageRequest{" +
-                    "mContext=" + mContext +
-                    ", mUrl='" + mUrl + '\'' +
-                    ", mImageView=" + mImageView +
-                    ", mListener=" + mListener +
-                    '}';
-        }
-
-        ZimageRequest copy() {
-            ZimageRequest req = new ZimageRequest();
-            req.mContext = mContext;
-            req.mUrl = mUrl;
-            req.mImageView = mImageView;
-            req.mListener = mListener;
-            req.mWidth = mWidth;
-            req.mHeight = mHeight;
-            req.mErrorResId = mErrorResId;
-            req.mLoadingResId = mLoadingResId;
-            return req;
-        }
-
-        void updateMeasuredSize() {
-            int w = mRequest.mImageView.getLayoutParams().width;
-            int h = mRequest.mImageView.getLayoutParams().height;
-
-            if(w < 1){
-                w = mRequest.mImageView.getMeasuredWidth();
-            }
-
-            if(h<1){
-                h = mRequest.mImageView.getMeasuredHeight();
-            }
-
-            if(w < 1 || h < 1)
-                Log.w(TAG, "updateMeasuredSize: cannot get correct image size");
-            mWidth = w;
-            mHeight = h;
-
-        }
-    }
 }

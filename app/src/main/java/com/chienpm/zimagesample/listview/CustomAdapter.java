@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 
 import com.chienpm.zimage.controller.Zimage;
-import com.chienpm.zimage.controller.ZimageEngine;
 import com.chienpm.zimagesample.R;
 
 import java.util.ArrayList;

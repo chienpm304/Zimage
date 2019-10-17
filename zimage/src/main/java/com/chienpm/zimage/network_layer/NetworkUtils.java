@@ -18,7 +18,7 @@ public class NetworkUtils {
                 cm.getActiveNetworkInfo().isConnected();
     }
 
-    public static void writeStreamToFile(InputStream inputStream, File targetFile) throws Exception {
+    static void writeStreamToFile(InputStream inputStream, File targetFile) throws Exception {
 
         try {
             FileOutputStream outStream = new FileOutputStream(targetFile);

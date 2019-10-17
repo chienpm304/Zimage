@@ -6,7 +6,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.chienpm.zimage.controller.Zimage.ZimageRequest;
 import com.chienpm.zimage.disk_layer.DiskCacheCallback;
 import com.chienpm.zimage.disk_layer.DiskCacheManager;
 import com.chienpm.zimage.exception.ZimageException;
@@ -28,12 +27,11 @@ import java.io.File;
  *              ...
  *              .into(ImageView)
  */
-public class ZimageEngine {
+ class ZimageEngine {
 
 
-    public static final String TAG = ZimageEngine.class.getSimpleName();
-    public static final String TAG_ERROR = "Zimage_ERROR";
-    public static int VERSION = 1;
+    private static final String TAG = ZimageEngine.class.getSimpleName();
+    private static final String TAG_ERROR = "Zimage_ERROR";
 
     /* ZimageEngine's exclusively instance*/
 //    private static ZimageEngine mInstance = null;
@@ -57,7 +55,7 @@ public class ZimageEngine {
     }
     /**
      * Hidden ZimageEngine constructor to deny user creating ZimageEngine instances, use only one.
-     * @param request
+     * @param request the copy version of the built Request through builder functions
      */
     ZimageEngine(ZimageRequest request) {
         this.mRequest = request.copy();

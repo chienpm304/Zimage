@@ -47,7 +47,7 @@ class DownloadTask implements Runnable {
      * @param handler which keeps MainThread's looper to make DownloadTask result callback will be invoked in MainThread
      * @param callback @DownloadCallback interface
      */
-    public DownloadTask(String url, Handler handler, DownloadCallback callback) {
+    DownloadTask(String url, Handler handler, DownloadCallback callback) {
         this.mUrlStr = url;
         this.mCallback = callback;
         this.mHandler = handler;

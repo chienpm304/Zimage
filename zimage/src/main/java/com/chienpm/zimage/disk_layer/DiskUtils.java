@@ -20,7 +20,7 @@ public class DiskUtils {
             return false;
     }
 
-    public static boolean checkFileIsExisted(File file) {
+    static boolean checkFileIsExisted(File file) {
         return file.exists() && file.isFile() && file.length() > 0;
     }
 
@@ -71,7 +71,7 @@ public class DiskUtils {
         return inSampleSize;
     }
 
-    public static void saveBitmap(Bitmap bitmap, File file) throws IOException {
+    static void saveBitmap(Bitmap bitmap, File file) throws IOException {
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);

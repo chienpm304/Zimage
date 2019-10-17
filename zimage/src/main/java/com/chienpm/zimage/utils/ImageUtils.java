@@ -13,7 +13,7 @@ public class ImageUtils {
         return null;
     }
 
-    public static int pickRandomBackground() {
+    private static int pickRandomBackground() {
         return Color.GRAY;
     }
 

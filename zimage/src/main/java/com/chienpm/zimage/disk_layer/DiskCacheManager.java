@@ -81,7 +81,7 @@ public class DiskCacheManager {
         }
         else{
 
-            throw new RuntimeException("DiskCacheCallback must be not null!");
+            throw new RuntimeException("loadbitmap(): DiskCacheCallback must be not null!");
 
         }
 
@@ -104,7 +104,7 @@ public class DiskCacheManager {
         }
         else{
 
-            throw new RuntimeException("DiskCacheCallback must be not null!");
+            throw new RuntimeException("saveBitmap(): DiskCacheCallback must be not null!");
 
         }
 

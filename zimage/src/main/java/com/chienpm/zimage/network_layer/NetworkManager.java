@@ -20,7 +20,7 @@ public class NetworkManager {
 
     private static Handler mHandler = null;
 
-    private static Object mSync = new Object();
+    private static final Object mSync = new Object();
 
 
     private NetworkManager(){

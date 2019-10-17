@@ -20,7 +20,7 @@ public class DiskSaveBitmapTask implements Runnable {
     private final String mUrl;
     private final Bitmap mBitmap;
 
-    public DiskSaveBitmapTask(String url, Bitmap bitmap, Handler handler, @NonNull DiskCacheCallback callback) {
+    DiskSaveBitmapTask(String url, Bitmap bitmap, Handler handler, @NonNull DiskCacheCallback callback) {
         this.mHandler = handler;
         this.mUrl = url;
         this.mBitmap = bitmap;

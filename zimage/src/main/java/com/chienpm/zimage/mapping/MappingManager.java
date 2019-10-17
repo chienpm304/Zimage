@@ -61,7 +61,7 @@ public class MappingManager {
     }
 
 
-    public static File getBaseDir(){
+    private static File getBaseDir(){
 
         File root;
 

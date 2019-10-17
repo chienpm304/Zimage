@@ -18,7 +18,7 @@ class DiskLoadBitmapTask implements Runnable{
     private final Handler mHandler;
     private final DiskCacheCallback mCallback;
 
-    public DiskLoadBitmapTask(String url, Handler handler, @NonNull DiskCacheCallback callback) {
+    DiskLoadBitmapTask(String url, Handler handler, @NonNull DiskCacheCallback callback) {
         this.mUrl = url;
         this.mHandler = handler;
         this.mCallback = callback;
