@@ -47,8 +47,8 @@ public class DemoSingleImageActivity extends AppCompatActivity {
             .getInstance()
             .with(this)
             .from(url)
-            .setLoadingResource(R.id.bottom)
-            .setErrorResource(R.id.bottom)
+//            .setLoadingResource(R.id.bottom)
+//            .setErrorResource(1123)
             .addListener(new ZimageCallback() {
                 @Override
                 public void onSucceed(@NonNull ImageView imageView, @NonNull String url) {

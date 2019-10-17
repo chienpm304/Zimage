@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 
 import com.chienpm.zimage.R;
@@ -139,7 +140,7 @@ public class Zimage {
      * @param resId is the Resource which will be render on ImageView while loading
      * @return ZimageEngine instance to continuous builder
      */
-    public Zimage setLoadingResource(@NonNull int resId){
+    public Zimage setLoadingResource(@IdRes int resId){
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_loading_drawable;
 
@@ -154,7 +155,7 @@ public class Zimage {
      * @param resId is the Resource which will be render on ImageView when loading failed
      * @return ZimageEngine instance to continuous builder
      */
-    public Zimage setErrorResource(@NonNull int resId){
+    public Zimage setErrorResource(@IdRes int resId){
 
         if(Validator.checkResourceId(resId))
             resId = R.drawable.default_error_drawable;
@@ -167,7 +168,7 @@ public class Zimage {
     /***
      *
      * @param imageView: the ImageView which will be apply image from url on.
-     * @return the ImageView with an image rendered on it.
+     * The ImageView with an image rendered on it.
      *         if any error occurs, an Error message will be render in ImageView
      *         and ErrorCallback will be called
      *
@@ -177,7 +178,6 @@ public class Zimage {
         mRequest.mImageView = imageView;
 
         new ZimageEngine(mRequest).execute();
-
     }
 
 }
