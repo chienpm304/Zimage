@@ -13,10 +13,10 @@ import com.chienpm.zimage.memory_layer.MemoryCacheManager;
 import com.chienpm.zimage.network_layer.NetworkManager;
 
 /**
- * ZimageEngine is the master class to apply url image into a ImageView
+ * Zimage is the master class to apply url image into a ImageView
  * Which is singleton and builder pattern:
  * @Usage:
- *          ZimageEngine.getInstance()
+ *          Zimage.getInstance()
  *              .with(Context)
  *              .from(String url)
  *              .reisze(witdth, height)
@@ -26,10 +26,10 @@ import com.chienpm.zimage.network_layer.NetworkManager;
 public class Zimage {
 
 
-    private static final String TAG = ZimageEngine.class.getSimpleName();
+    private static final String TAG = Zimage.class.getSimpleName();
     private static final String TAG_ERROR = "Zimage_ERROR";
 
-    /* ZimageEngine's exclusively instance*/
+    /* Zimage's exclusively instance*/
     private static Zimage mInstance = null;
 
     private static final Object mSync = new Object();
@@ -37,7 +37,7 @@ public class Zimage {
     private ZimageRequest mRequest = new ZimageRequest();
 
     /**
-     * Hidden ZimageEngine constructor to deny user creating ZimageEngine instances, use only one.
+     * Hidden Zimage constructor to deny user creating Zimage instances, use only one.
      */
     private Zimage() {
         reset();
@@ -61,7 +61,7 @@ public class Zimage {
     /**
      *
      * @param context of Activity
-     * @return ZimageEngine instance to continuous builder
+     * @return Zimage instance to continuous builder
      */
     public Zimage with(Context context){
         mRequest.mContext = context;
@@ -69,9 +69,8 @@ public class Zimage {
     }
 
     /***
-     *
      * @param url: Image string url need to display
-     * @return ZimageEngine instance to continuous builder
+     * @return Zimage instance to continuous builder
      */
     public Zimage from(@NonNull String url) {
         mRequest.mUrl = url;
@@ -91,7 +90,7 @@ public class Zimage {
     /***
      *
      * @param resId is the Resource which will be render on ImageView while loading
-     * @return ZimageEngine instance to continuous builder
+     * @return Zimage instance to continuous builder
      */
     public Zimage setLoadingResource(@IdRes int resId){
         if(Validator.checkResourceId(resId))
@@ -106,7 +105,7 @@ public class Zimage {
     /***
      *
      * @param resId is the Resource which will be render on ImageView when loading failed
-     * @return ZimageEngine instance to continuous builder
+     * @return Zimage instance to continuous builder
      */
     public Zimage setErrorResource(@IdRes int resId){
 
