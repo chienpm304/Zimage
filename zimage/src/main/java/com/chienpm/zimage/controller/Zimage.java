@@ -28,29 +28,11 @@ public class Zimage {
 
     private static final String TAG = ZimageEngine.class.getSimpleName();
     private static final String TAG_ERROR = "Zimage_ERROR";
-    public static int VERSION = 1;
 
     /* ZimageEngine's exclusively instance*/
     private static Zimage mInstance = null;
 
-    private static NetworkManager mNetworkManager = null;
-
-    private static DiskCacheManager mDiskCacheManager = null;
-
-    private static MemoryCacheManager mMemoryCacheManager = null;
-
     private static final Object mSync = new Object();
-
-
-    // Inputs request fields
-//    private Context mContext;
-//    private String mUrl;
-//    private int mLoadingResId;
-//    private int mErrorResId;
-//    private ImageView mImageView;
-//    private int mWidth;
-//    private int mHeight;
-//    private ZimageCallback mListener;
 
     private ZimageRequest mRequest = new ZimageRequest();
 
@@ -58,17 +40,8 @@ public class Zimage {
      * Hidden ZimageEngine constructor to deny user creating ZimageEngine instances, use only one.
      */
     private Zimage() {
-        initManagers();
         reset();
     }
-
-
-    private void initManagers() {
-        mNetworkManager = NetworkManager.getInstance();
-        mDiskCacheManager = DiskCacheManager.getInstance();
-        mMemoryCacheManager = MemoryCacheManager.getInstance();
-    }
-
 
     public static Zimage getInstance(){
         synchronized (mSync) {
@@ -80,17 +53,9 @@ public class Zimage {
         return mInstance;
     }
 
-    public void reset() {
+    private void reset() {
         mInstance = null;
         mRequest.reset();
-//        mContext = null;
-//        mUrl = "";
-//        mImageView = null;
-//        mListener = null;
-//        mLoadingResId = R.drawable.default_loading_drawable;
-//        mErrorResId = R.drawable.default_error_drawable;
-//        mWidth = 0;
-//        mHeight = 0;
     }
 
     /**
@@ -122,18 +87,6 @@ public class Zimage {
         mRequest.mListener = listener;
         return mInstance;
     }
-
-
-    /**
-     * @param width is new width of the bitmap to be cached on Disk
-     * @param height is new height of the bitmap to be cached on Disk
-     * @return ZimageEngine instance to continuous builder
-     */
-//    public Zimage resize(int width, int height){
-//        this.mWidth = width;
-//        this.mHeight = height;
-//        return mInstance;
-//    }
 
     /***
      *
