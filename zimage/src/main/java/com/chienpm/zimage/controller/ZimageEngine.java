@@ -17,33 +17,28 @@ import com.chienpm.zimage.utils.ImageUtils;
 import java.io.File;
 
 /**
- * ZimageEngine is the master class to apply url image into a ImageView
- * Which is singleton and builder pattern:
- * @Usage:
- *          ZimageEngine.getInstance()
- *              .with(Context)
- *              .from(String url)
- *              .reisze(witdth, height)
- *              ...
- *              .into(ImageView)
+ * 
  */
- class ZimageEngine {
-
+class ZimageEngine {
 
     private static final String TAG = ZimageEngine.class.getSimpleName();
-    private static final String TAG_ERROR = "Zimage_ERROR";
 
-    /* ZimageEngine's exclusively instance*/
-//    private static ZimageEngine mInstance = null;
-
+ 	/* NetworkManager's instance */
     private static NetworkManager mNetworkManager = null;
 
+
+	/* DiskCacheManager's instance */
     private static DiskCacheManager mDiskCacheManager = null;
 
-    private static MemoryCacheManager mMemoryCacheManager = null;
 
+	/* MemoryCacheManager's instance */
+    private static MemoryCacheManager mMemoryCacheManager = null;
+	
+	/* Synchonize object */
     private static Object mSync = new Object();
 
+	
+	/* Request information holder*/
     private ZimageRequest mRequest;
 
 
@@ -53,6 +48,8 @@ import java.io.File;
         mDiskCacheManager = DiskCacheManager.getInstance();
         mMemoryCacheManager = MemoryCacheManager.getInstance();
     }
+	
+	
     /**
      * Hidden ZimageEngine constructor to deny user creating ZimageEngine instances, use only one.
      * @param request the copy version of the built Request through builder functions
@@ -64,29 +61,14 @@ import java.io.File;
 
 
 
-
-//    public static ZimageEngine getInstance(){
-//        synchronized (mSync) {
-//            if (mInstance == null) {
-//                mInstance = new ZimageEngine();
-//                mSync.notifyAll();
-//            }
-//        }
-//        return mInstance;
-//    }
-
+	/**
+	 * Initialize nescessary data for next processes
+	 */
     private void initParameters() {
-////        mRequest.mWidth = mRequest.mImageView.getMeasuredWidth();
-////        mRequest.mHeight = mRequest.mImageView.getMeasuredHeight();
-//
-//        mRequest.mWidth = mRequest.mImageView.getLayoutParams().width;
-//        mRequest.mHeight = mRequest.mImageView.getLayoutParams().height;
 
         mRequest.updateMeasuredSize();
         Log.i(TAG, "initParameters: "+mRequest.mWidth+"x"+mRequest.mHeight);
-//        mContext.createConfigurationContext(new Configuration())
 
-//        Log.i(TAG, "ImageView: "+mWidth+"x"+mHeight);
     }
 
 
@@ -104,14 +86,18 @@ import java.io.File;
 
         }
         catch (ZimageException e){
+			
             throw e;
+			
         }
     }
 
+
+
     /**
      * Handle Errors which occur when processing
-     * Draw error bitmap on image
-     * @param e is Exception instance which contain error message.
+     * Draw error resource on image
+     * @param e is ZimageException instance which contain error message.
      */
     private void handleErrors(ZimageException e) {
 
@@ -156,7 +142,9 @@ import java.io.File;
     }
 
     /**
-     * Try to load bitmap from local disk storage using url key
+     * Try to load bitmap from local disk storage using url key.
+	 * If load succeed: draw bitmap on ImageView and save bitmap on Memory.
+	 * If load failed : try to fetch image from network.
      */
     private void loadBitmapFromDisk() {
 
@@ -196,7 +184,9 @@ import java.io.File;
 
     /**
      * Try to fetch image from network using DownloadTask to decoded image to bitmap
-     * The bitmap result is call in DownloadTask
+     * The bitmap result is call in DownloadTask:
+	 * fetch succeed: draw bitmap on ImageView, save it on Disk and Memory
+	 * fetch failed : handleErrors (draw errror resource)
      */
     private void fetchImageFromNetwork() {
 
@@ -238,6 +228,11 @@ import java.io.File;
         });
     }
 
+
+
+	/**
+	 * Save the bitmap instance in Memory Cache with mRequest.url
+	 */
     private void saveBitmapOnMemory(Bitmap bitmap) {
 
         //Resize bitmap before cached it on memory
@@ -246,6 +241,11 @@ import java.io.File;
 
     }
 
+
+	/**
+	 * Save the bitmap instance on Disk with mRequest.url for next cache access
+	 * The results are returned in DiskCacheCallback
+	 */
     private void saveBitmapOnDisk(Bitmap bitmap) {
 
         mDiskCacheManager.saveBitmap(mRequest.mUrl, bitmap, new DiskCacheCallback() {
@@ -304,8 +304,17 @@ import java.io.File;
     }
 
 
+	/**
+	 * Try to excute the request by flows:
+	 * - Apply loading resource
+	 * - Validate request parameters
+	 * - Initialize request data
+	 * - Try to loading bitmap from Memory (with url)
+	 * If there is any error occurs while processing, process will be stop and render Error resource
+	 */
     void execute(){
-        try {
+        
+		try {
 
             applyLoadingImage();
 
@@ -317,11 +326,15 @@ import java.io.File;
 
         }
         catch (ZimageException e){
-            Log.e(TAG_ERROR, "ZimageEngine summary error: ", e);
-            e.printStackTrace();
-            handleErrors(e);
+        
+			Log.e(TAG_ERROR, "ZimageEngine summary error: ", e);
+            
+			e.printStackTrace();
+            
+			handleErrors(e);
 
         }
 
     }
+	
 }

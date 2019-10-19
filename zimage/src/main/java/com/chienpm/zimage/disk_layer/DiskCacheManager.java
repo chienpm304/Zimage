@@ -3,26 +3,35 @@ package com.chienpm.zimage.disk_layer;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
-
 import androidx.annotation.NonNull;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+
 public class DiskCacheManager {
 
+	/* The exclusively instance of class */
     private static DiskCacheManager mInstance = null;
 
+	/* Executor service to execute Runables on limited number of threads */
     private static ExecutorService mExecutor = null;
 
+	/* Mainthread handler for posting result in Mainthread */
     private static Handler mHandler = null;
 
+	/* Synchronize object*/
     private static final Object mSync = new Object();
 
+	/* Hidden constructor for singleton design pattern*/
     private DiskCacheManager(){
-        initFields();
+        
+		initFields();
+		
     }
 
+
+	/* Intit Executor service and handler once*/
     private void initFields() {
 
         mExecutor = Executors.newFixedThreadPool(4);
@@ -31,6 +40,11 @@ public class DiskCacheManager {
 
     }
 
+
+	/**
+	 * Get the DiskCacheManager's instance
+	 * @return mInstance
+	 */ 
     public static DiskCacheManager getInstance() {
 
         synchronized (mSync){
@@ -50,26 +64,12 @@ public class DiskCacheManager {
 
 
     /**
-     * @param url: Cloud Image's URL string
-     * @return  the Bitmap image which loaded from disk storage
-     *          or NULL if the image has not cached on disk yet
-     * @Note: do not throw exception for next request cache layer
+     * Try to loadbitmap from disk storage by using url to get file location 
+	 * @param 
+	 *	url: Cloud Image's URL string
+	 *  @NotNull callback: DiskCacheCallback interface
+	 * 
      */
-//    public Bitmap loadBitmap(String url) {
-//
-//        File file = MappingManager.getFileFromURL(url);
-//
-//        // check if the image is existed on disk or not
-//        if(DiskUtils.checkFileIsExisted(file)){
-//
-//            return DiskUtils.loadBitmapFromFile(file);
-//
-//        }
-//
-//        return null;
-//    }
-
-
     public void loadBitmap(final String url, @NonNull final DiskCacheCallback callback) {
 
         if(callback != null) {
