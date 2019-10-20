@@ -219,7 +219,7 @@ class ZimageEngine {
             @Override
             public void onFailed(@NonNull ZimageException err) {
 
-                Log.e(TAG_ERROR, "NetworkLayer fetch image Failed: ", err);
+                Log.e(TAG, "NetworkLayer fetch image Failed: ", err);
 
                 handleErrors(err);
 
@@ -260,7 +260,7 @@ class ZimageEngine {
             @Override
             public void onFailed(ZimageException err) {
 
-                Log.e(TAG_ERROR, "DiskCache saveBitmapOnDisk Failed" + err.getMessage());
+                Log.e(TAG, "DiskCache saveBitmapOnDisk Failed" + err.getMessage());
 
             }
         });
@@ -327,7 +327,7 @@ class ZimageEngine {
         }
         catch (ZimageException e){
         
-			Log.e(TAG_ERROR, "ZimageEngine summary error: ", e);
+			Log.e(TAG, "ZimageEngine summary error: ", e);
             
 			e.printStackTrace();
             
