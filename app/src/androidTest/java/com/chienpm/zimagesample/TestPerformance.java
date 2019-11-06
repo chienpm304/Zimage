@@ -13,10 +13,13 @@ import org.junit.runner.RunWith;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -28,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
-public class ExampleInstrumentedTest {
+public class TestPerformance {
     private static final String TAG = "TestPerformance";
 
     @Test
@@ -123,5 +126,31 @@ public class ExampleInstrumentedTest {
 
         assertNotNull(response);
         assertTrue(response.length() > 0);
+    }
+
+    public List<String> loadImages(){
+        List<String> images = new ArrayList<>();
+
+        try {
+
+            Context testContext = InstrumentationRegistry.getInstrumentation().getContext();
+            InputStream inputStream = testContext.getAssets().open("images.txt");
+
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+
+            while ((line = bufferedReader.readLine())!=null){
+                images.add(line);
+                System.out.println(line);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            images.clear();
+        }
+
+        assertTrue(images.size()>0);
+        return  images;
     }
 }
