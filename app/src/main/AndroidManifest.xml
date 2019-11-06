@@ -9,22 +9,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".gridview.DemoGridviewActivity">
+        <activity android:name=".activities.DemoGridviewActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".singleimage.DemoSingleImageActivity"></activity>
-        <activity android:name=".listview.DemoListViewActivity"></activity>
+        <activity android:name=".activities.DemoSingleImageActivity"></activity>
+        <activity android:name=".activities.DemoListViewActivity"></activity>
     </application>
 
 </manifest>

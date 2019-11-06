@@ -1,4 +1,4 @@
-package com.chienpm.zimagesample.singleimage;
+package com.chienpm.zimagesample.activities;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -27,7 +27,7 @@ public class DemoSingleImageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.single_image);
+        setContentView(R.layout.activity_single_image);
         mContext = getApplicationContext();
         mEdtUrl = findViewById(R.id.edtURL);
 

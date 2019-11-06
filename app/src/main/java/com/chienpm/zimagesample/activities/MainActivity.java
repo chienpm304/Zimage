@@ -1,4 +1,4 @@
-package com.chienpm.zimagesample;
+package com.chienpm.zimagesample.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,9 +6,7 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.chienpm.zimagesample.gridview.DemoGridviewActivity;
-import com.chienpm.zimagesample.listview.DemoListViewActivity;
-import com.chienpm.zimagesample.singleimage.DemoSingleImageActivity;
+import com.chienpm.zimagesample.R;
 
 public class MainActivity extends AppCompatActivity {
 

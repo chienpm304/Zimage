@@ -1,4 +1,4 @@
-package com.chienpm.zimagesample.gridview;
+package com.chienpm.zimagesample.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.chienpm.zimagesample.R;
+import com.chienpm.zimagesample.adapters.GridViewAdapter;
 
 public class DemoGridviewActivity extends AppCompatActivity {
 
@@ -44,7 +45,7 @@ public class DemoGridviewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gridview_demo);
+        setContentView(R.layout.activity_gridview);
 
         GridViewAdapter adapterViewAndroid = new GridViewAdapter(DemoGridviewActivity.this, gridViewString, gridViewImageUrl);
         androidGridView=(GridView)findViewById(R.id.grid_view_image_text);

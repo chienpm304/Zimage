@@ -1,4 +1,4 @@
-package com.chienpm.zimagesample.gridview;
+package com.chienpm.zimagesample.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -47,7 +47,7 @@ public class GridViewAdapter extends BaseAdapter {
         if (convertView == null) {
 
             gridViewAndroid = new View(mContext);
-            gridViewAndroid = inflater.inflate(R.layout.grid_item, null);
+            gridViewAndroid = inflater.inflate(R.layout.gridview_item, null);
             TextView textViewAndroid = (TextView) gridViewAndroid.findViewById(R.id.android_gridview_text);
             ImageView imageViewAndroid = (ImageView) gridViewAndroid.findViewById(R.id.android_gridview_image);
             textViewAndroid.setText(gridViewString[i]);

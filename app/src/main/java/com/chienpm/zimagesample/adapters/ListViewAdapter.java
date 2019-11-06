@@ -1,4 +1,4 @@
-package com.chienpm.zimagesample.listview;
+package com.chienpm.zimagesample.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +14,14 @@ import android.widget.TextView;
 
 import com.chienpm.zimage.controller.Zimage;
 import com.chienpm.zimagesample.R;
+import com.chienpm.zimagesample.viewholders.ListViewSubjectData;
 
 import java.util.ArrayList;
 
-class CustomAdapter implements ListAdapter {
-    ArrayList<SubjectData> arrayList;
+public class ListViewAdapter implements ListAdapter {
+    ArrayList<ListViewSubjectData> arrayList;
     Context context;
-    public CustomAdapter(Context context, ArrayList<SubjectData> arrayList) {
+    public ListViewAdapter(Context context, ArrayList<ListViewSubjectData> arrayList) {
         this.arrayList=arrayList;
         this.context=context;
     }
@@ -67,10 +68,10 @@ class CustomAdapter implements ListAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final SubjectData subjectData=arrayList.get(position);
+        final ListViewSubjectData subjectData=arrayList.get(position);
       if(convertView==null){
           LayoutInflater layoutInflater = LayoutInflater.from(context);
-          convertView=layoutInflater.inflate(R.layout.list_row, null);
+          convertView=layoutInflater.inflate(R.layout.listview_item, null);
           convertView.setOnClickListener(new View.OnClickListener() {
               @Override
               public void onClick(View v) {

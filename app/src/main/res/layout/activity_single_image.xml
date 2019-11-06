@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".singleimage.DemoSingleImageActivity">
+    tools:context=".activities.DemoSingleImageActivity">
 
     <TextView
         android:id="@+id/tvURL"
@@ -27,11 +27,11 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:scaleType="center"
         android:background="@android:color/darker_gray"
         android:layout_centerInParent="true"
-        android:src="@drawable/abc_vector_test"
+
          />
 
     <Button
