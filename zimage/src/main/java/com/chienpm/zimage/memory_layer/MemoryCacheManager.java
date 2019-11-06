@@ -15,30 +15,46 @@ import com.chienpm.zimage.mapping.MappingManager;
 public class MemoryCacheManager {
 
 
+	/* The LurCache for caching Bitmap images */
     private static LruCache<String, Bitmap> mBitmapCache;
 
+
+	/* THe exclusively instance of MEmoryCachemanger*/
     private static MemoryCacheManager mInstance = null;
 
+
+	/* Synchonize objecet */
     private static final Object mSync = new Object();
 
 
-
+	/**
+	 * Hidden constructor adaptive to Singleton pattern
+	 * Determine the cache size of LruCache
+	 */
     private MemoryCacheManager(){
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory()/1024);
+        
+		final int maxMemory = (int) (Runtime.getRuntime().maxMemory()/1024);
 
         // Use 1/8th of the available memory for this memory cache.
         final int cacheSize = maxMemory / 8;
 
         mBitmapCache = new LruCache<String, Bitmap>(cacheSize){
 
-            @Override
+          @Override
           protected int sizeOf(String key, Bitmap bitmap){
-              return bitmap.getByteCount()/1024;
+          
+			return bitmap.getByteCount()/1024;
+			
           }
 
         };
     }
 
+
+
+	/**
+	 * @return mInstance
+	 */
     public static MemoryCacheManager getInstance() {
 
         synchronized (mSync){
@@ -54,10 +70,15 @@ public class MemoryCacheManager {
         }
 
         return  mInstance;
+		
     }
 
 
 
+	/**
+	 * Loading bitmap instance mapped by url, width and height
+	 * @return android.graphics.Bitmap or Null if not existed in Cache
+	 */
     public Bitmap loadBitmap(@NonNull String url, int width, int height) {
 
         String key = MappingManager.getKeyFromUrl(url, width, height);
@@ -66,6 +87,11 @@ public class MemoryCacheManager {
 
     }
 
+
+	
+	/**
+	 * Save bitmap instance on LruCache
+	 */
     public void saveBitmap(String url, Bitmap bitmap, int width, int height) {
 
         if(loadBitmap(url, width, height) == null){

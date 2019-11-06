@@ -7,15 +7,16 @@ import java.io.IOException;
 public class ZimageException extends Exception {
 
     private Throwable mCause;
+	
     private String mMessage;
-    private ErrorCode mCode;
+    
+	private ErrorCode mCode;
 
-    public ZimageException(ErrorCode errInvalidImageView) {
+    public ZimageException(ErrorCode code) {
 
-        mCode = errInvalidImageView;
+        mCode = code;
 
     }
-
 
 
     public ZimageException(ErrorCode code, String message, Throwable cause, StackTraceElement[] stackTrace) {

@@ -9,10 +9,11 @@ import com.chienpm.zimage.exception.ErrorCode;
 import com.chienpm.zimage.utils.MyUtils;
 
 
-/***
+/**
  *  Validator is a helper class providing validation methods
  */
 public class Validator {
+
 
     /***
      * Check if the ImageView passed is correct to apply bitmap on or not.
@@ -30,11 +31,12 @@ public class Validator {
     }
 
 
+
     /**
      * Check if the Image URL passed is matching with standard url pattern or not
      * Do not check if it is a real image'url or not, we do in Network Layer later (if need)
      * @param mUrl string
-     * @throws ZimageException message return: @ErrorCode.ERR_INVALID_IMAGE_URL
+     * @throws ZimageException code @ErrorCode.ERR_INVALID_IMAGE_URL
      */
     static void checkUrl(String mUrl) throws ZimageException{
         if(!MyUtils.isValidUrlPattern(mUrl))
@@ -42,15 +44,18 @@ public class Validator {
 
     }
 
+
+
     /**
      * Check if the context passed is valid or not, context is necessary for system accession
      * @param mContext is the context of the ImageView to be render
-     * @throws ZimageException message @ErrorCode.ERR_INVALID_CONTEXT
+     * @throws ZimageException code @ErrorCode.ERR_INVALID_CONTEXT
      */
-    static void  checkContext(Context mContext) throws ZimageException{
+    static void checkContext(Context mContext) throws ZimageException{
         if(mContext == null)
             throw new ZimageException(ErrorCode.ERR_INVALID_CONTEXT);
     }
+
 
 
     /**
@@ -59,12 +64,16 @@ public class Validator {
      * @return True or False
      */
     public static boolean checkBitmap(Bitmap bitmap) {
+		
         //Todo: validate if bitmap is invalid
-//        return false;
         return bitmap!=null && bitmap.getByteCount() > 0;
+		
     }
 
-
+	/**
+	 * Check if the resource is is invalied to render or not
+	 * @return true if valid and false if not
+	 */
     static boolean checkResourceId(int resId) {
 
         return true;

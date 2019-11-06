@@ -10,18 +10,29 @@ import com.chienpm.zimage.R;
 
 class ZimageRequest {
 
-    private static final String TAG = ZimageRequest.class.getSimpleName();
-    Context mContext;
-    String mUrl;
-    ImageView mImageView;
-    ZimageCallback mListener;
-    int mWidth;
-    int mHeight;
-    int mLoadingResId;
-    int mErrorResId;
+    
+	private static final String TAG = ZimageRequest.class.getSimpleName();
+    
+	Context mContext;
+    
+	String mUrl;
+    
+	ImageView mImageView;
+    
+	ZimageCallback mListener;
+    
+	int mWidth;
+    
+	int mHeight;
+    
+	int mLoadingResId;
+    
+	int mErrorResId;
 
     ZimageRequest() {
-        reset();
+    
+		reset();
+
     }
 
     void reset() {
@@ -47,6 +58,7 @@ class ZimageRequest {
     }
 
     ZimageRequest copy() {
+		
         ZimageRequest req = new ZimageRequest();
         req.mContext = mContext;
         req.mUrl = mUrl;
@@ -59,6 +71,9 @@ class ZimageRequest {
         return req;
     }
 
+	/**
+	 * Get absolutated size of ImageView instance into width and heigh fields.
+	 */
     void updateMeasuredSize() {
         int w = mImageView.getLayoutParams().width;
         int h = mImageView.getLayoutParams().height;

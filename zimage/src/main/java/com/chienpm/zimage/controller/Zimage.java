@@ -27,22 +27,35 @@ public class Zimage {
 
 
     private static final String TAG = Zimage.class.getSimpleName();
-    private static final String TAG_ERROR = "Zimage_ERROR";
+	
 
     /* Zimage's exclusively instance*/
     private static Zimage mInstance = null;
 
-    private static final Object mSync = new Object();
+    
+	/* Temporary object for synchornize operation */
+	private static final Object mSync = new Object();
 
+
+
+	/* Request information holder*/
     private ZimageRequest mRequest = new ZimageRequest();
+
+
 
     /**
      * Hidden Zimage constructor to deny user creating Zimage instances, use only one.
+	 * Get Zimage instance by: Zimage.getInstance();
      */
     private Zimage() {
         reset();
     }
 
+
+	/**
+	 * Get the mInstance - the only one instance of this class
+	 *
+	 */
     public static Zimage getInstance(){
         synchronized (mSync) {
             if (mInstance == null) {
@@ -53,29 +66,37 @@ public class Zimage {
         return mInstance;
     }
 
+	/**
+	 * Reset request 
+	 */
     private void reset() {
         mInstance = null;
         mRequest.reset();
     }
 
+
     /**
      *
      * @param context of Activity
-     * @return Zimage instance to continuous builder
+     * @return Zimage instance for continuous builder
      */
     public Zimage with(Context context){
         mRequest.mContext = context;
         return this;
     }
 
+
+
     /***
      * @param url: Image string url need to display
-     * @return Zimage instance to continuous builder
+     * @return Zimage instance for continuous builder
      */
     public Zimage from(@NonNull String url) {
         mRequest.mUrl = url;
         return mInstance;
     }
+
+
 
     /**
      * Add an @ZimageCallback to listen the callback result is succeed or failed
@@ -87,10 +108,13 @@ public class Zimage {
         return mInstance;
     }
 
+
+
     /***
      *
      * @param resId is the Resource which will be render on ImageView while loading
-     * @return Zimage instance to continuous builder
+     * @return Zimage instance for continuous builder
+	 * 
      */
     public Zimage setLoadingResource(@IdRes int resId){
         if(Validator.checkResourceId(resId))
@@ -102,10 +126,12 @@ public class Zimage {
     }
 
 
+
     /***
      *
      * @param resId is the Resource which will be render on ImageView when loading failed
-     * @return Zimage instance to continuous builder
+     * @return Zimage instance for continuous builder
+	 * 
      */
     public Zimage setErrorResource(@IdRes int resId){
 
@@ -116,6 +142,8 @@ public class Zimage {
 
         return mInstance;
     }
+
+
 
     /***
      *

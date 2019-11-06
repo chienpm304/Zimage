@@ -14,17 +14,34 @@ public class MappingManager {
 
     public static final String TAG = MappingManager.class.getSimpleName();
 
+	/**
+	 * Get string key from URL only
+	 * @param url: String
+	 * @return String key
+	 */
     public static String getKeyFromUrl(String url) {
         return String.valueOf(Math.abs(url.hashCode()));
     }
 
+
+
+	/**
+	 * Get string key from URL, width and height
+	 * @param url: String
+	 * @param width: int
+	 * @param height: int
+	 * @return String key
+	 */
     public static String getKeyFromUrl(String url, int width, int height) {
         return String.valueOf(Math.abs(new String(url+width+height).hashCode()));
     }
+	
+	
     /**
-     *
-     * @param url
-     * @return the temporary file path to download temporary image without extension
+     * Get temporary file when fetch image from network
+     * @param url: String
+	 * @param extension: String
+     * @return java.io.File - the temporary file path to download temporary image with extension
      */
     public static File getTemporaryFileFromUrl(String url, String extension) {
 
@@ -43,6 +60,11 @@ public class MappingManager {
     }
 
 
+	/**
+	 * Get file location from url
+	 * @param url: String
+	 * @return java.io.File 
+	 */
     public static File getFileFromURL(String url) {
 
         String file_name = String.valueOf(Math.abs(url.hashCode())) + ".jpg";
@@ -61,6 +83,10 @@ public class MappingManager {
     }
 
 
+	/**
+	 * Get the root cache directory (choose manual)
+	 * @return java.io.File
+	 */ 
     private static File getBaseDir(){
 
         File root;
